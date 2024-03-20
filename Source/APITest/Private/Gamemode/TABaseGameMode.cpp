@@ -2,4 +2,18 @@
 
 
 #include "Gamemode/TABaseGameMode.h"
+#include "QuestSystem/TAQuestManager.h"
 
+
+ATABaseGameMode::ATABaseGameMode()
+{
+    UTAQuestManager::GetInstance();
+}
+
+
+void ATABaseGameMode::StartPlay()
+{
+    Super::StartPlay();
+
+ 
+}

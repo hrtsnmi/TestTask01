@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+
 #include "TAQuestManager.generated.h"
 
 UENUM()
@@ -40,4 +41,13 @@ class APITEST_API UTAQuestManager : public UObject
 private:
     UPROPERTY()
     TArray<FQuestData> QuestDataArray;
+
+protected:
+    UTAQuestManager();
+
+    static UTAQuestManager* SingletonInstance;
+
+public:
+
+    static UTAQuestManager* GetInstance();
 };

@@ -14,4 +14,9 @@ class APITEST_API ATABaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+
+public:
+    ATABaseGameMode();
+
+    virtual void StartPlay() override;
 };
