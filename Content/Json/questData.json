@@ -1,0 +1,36 @@
+{
+	"questArray": [
+		{
+			"id": "0",
+			"questDesc": "This first quest for...",
+			"questType": "MoveTo",
+			"locationX": -570,
+			"locationY": 109,
+			"locationZ": 30
+		},
+		{
+			"id": "1",
+			"questDesc": "This second quest for...",
+			"questType": "FindItem",
+			"locationX": 570,
+			"locationY": -109,
+			"locationZ": 30
+		},
+		{
+			"id": "2",
+			"questDesc": "This main quest for...",
+			"questType": "MoveTo",
+			"locationX": 1530,
+			"locationY": 350,
+			"locationZ": 30
+		},
+		{
+			"id": "3",
+			"questDesc": "This minor quest for...",
+			"questType": "FindItem",
+			"locationX": -2000,
+			"locationY": -50,
+			"locationZ": 30
+		}
+	]
+}
