@@ -13,6 +13,12 @@ class APITEST_API UTAQuestComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+private:
+    FQuestData CurrentQusetData;
+
+	void StartMoveTo();
+    void StartFindItem();
+
 public:	
 	UTAQuestComponent();
 
