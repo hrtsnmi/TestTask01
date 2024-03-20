@@ -22,7 +22,7 @@ TSharedPtr<FJsonObject> ReadJSon(const FName& JsonPath)
     //Try to convert string to JSonObj
     if (!FJsonSerializer::Deserialize(Reader, AfterJsonIsReadAsObject))
     {
-        nullptr;
+        return nullptr;
     }
 
     return AfterJsonIsReadAsObject;
@@ -30,9 +30,13 @@ TSharedPtr<FJsonObject> ReadJSon(const FName& JsonPath)
 
 TArray<FQuestData> ReadToArrayFromJsonObject(TSharedPtr<FJsonObject> JSonObject)
 {
-    TArray<TSharedPtr<FJsonValue>> JsonValues = JSonObject->GetArrayField(TEXT("questArray"));
-
     TArray<FQuestData> Result;
+    if (!JSonObject.IsValid())
+    {
+        return Result;
+    }
+
+    TArray<TSharedPtr<FJsonValue>> JsonValues = JSonObject->GetArrayField(TEXT("questArray"));
     for (TSharedPtr<FJsonValue>& JsonValue : JsonValues)
     {
         if (JsonValue.IsValid())
