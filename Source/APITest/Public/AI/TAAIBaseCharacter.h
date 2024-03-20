@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
+
 #include "TAAIBaseCharacter.generated.h"
 
 
@@ -18,8 +20,6 @@ public:
 	ATAAIBaseCharacter();
 
 	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
 

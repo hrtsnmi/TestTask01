@@ -24,9 +24,4 @@ void ATAAIBaseCharacter::Tick(float DeltaTime)
 
 }
 
-void ATAAIBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
