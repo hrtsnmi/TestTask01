@@ -10,12 +10,23 @@ ATAAIBaseCharacter::ATAAIBaseCharacter()
 
 	QuestComponent = CreateDefaultSubobject<UTAQuestComponent>(TEXT("QuestComponent"));
 
+	CurrentInteractType = EInteractType::Slave;
 }
 
 void ATAAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+FQuestData ATAAIBaseCharacter::UnderInteract_Implementation()
+{
+    return FQuestData();
+}
+
+EInteractType ATAAIBaseCharacter::GetInteractType_Implementation() const
+{
+    return CurrentInteractType;
 }
 
 void ATAAIBaseCharacter::Tick(float DeltaTime)
