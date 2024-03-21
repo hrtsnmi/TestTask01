@@ -27,3 +27,20 @@ UTAQuestManager* UTAQuestManager::GetInstance()
     }
     return SingletonInstance;
 }
+
+FQuestData UTAQuestManager::GetAvailableQuest()
+{
+    FQuestData DataToTransfer;
+
+    if (QuestDataArray.IsEmpty())
+    {
+        //Dont have any quests
+        DataToTransfer.Id = -1;
+        return MoveTemp(DataToTransfer);
+    }
+
+    DataToTransfer = QuestDataArray[index];
+    ++index %= QuestDataArray.Num();
+
+    return MoveTemp(DataToTransfer);
+}

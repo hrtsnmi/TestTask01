@@ -41,6 +41,7 @@ class APITEST_API UTAQuestManager : public UObject
 private:
     UPROPERTY()
     TArray<FQuestData> QuestDataArray;
+    int32 index{0};
 
 protected:
     UTAQuestManager();
@@ -50,4 +51,6 @@ protected:
 public:
 
     static UTAQuestManager* GetInstance();
+
+    FQuestData GetAvailableQuest();
 };

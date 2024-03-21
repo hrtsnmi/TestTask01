@@ -11,7 +11,7 @@ void ATAPlayerState::BeginPlay()
     OwnerHasActiveQuest = EQuestProgress::NONE;
 }
 
-void ATAPlayerState::SetQusetData(FQuestData NewQusetData)
+void ATAPlayerState::SetQuestData(FQuestData NewQusetData)
 {
     switch (OwnerHasActiveQuest)
     {
@@ -30,13 +30,13 @@ void ATAPlayerState::SetQusetData(FQuestData NewQusetData)
     }  
 }
 
-FQuestData ATAPlayerState::GetQusetData() const
+FQuestData ATAPlayerState::GetQuestData() const
 {
     return CurrentQuestData;
 }
 
 void ATAPlayerState::SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent)
 {
-    QuestComponent->OnGetQuestData.BindUObject(this, &ATAPlayerState::GetQusetData);
-    QuestComponent->OnSetQuestData.BindUObject(this, &ATAPlayerState::SetQusetData);
+    QuestComponent->OnGetQuestData.BindUObject(this, &ATAPlayerState::GetQuestData);
+    QuestComponent->OnSetQuestData.AddUObject(this, &ATAPlayerState::SetQuestData);
 }

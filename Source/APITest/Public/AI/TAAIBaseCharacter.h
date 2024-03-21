@@ -8,8 +8,10 @@
 
 #include "TAAIBaseCharacter.generated.h"
 
-
 class UTAQuestComponent;
+class USphereComponent;
+class UWidgetComponent;
+class UNPCInfoWidget;
 
 UCLASS()
 class APITEST_API ATAAIBaseCharacter : public ACharacter, public IInteractableInterface
@@ -21,12 +23,38 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+private:
+    UFUNCTION()
+    void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+   UFUNCTION()
+    void ComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+   void WatchActorInRangeToShowWidget(AActor* OtherActor, bool bIsWidgetVisible);
+
+
+private: //Widget
+    UPROPERTY(EditDefaultsOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+    UNPCInfoWidget* CurrentWidget;
+    UPROPERTY(EditDefaultsOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+    TSubclassOf<UNPCInfoWidget> HUD;
+    UPROPERTY(EditDefaultsOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
+    UWidgetComponent* WorldWidget;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
     TObjectPtr<UTAQuestComponent> QuestComponent;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+    USphereComponent* SphereComp;
+
+protected:
+    //void GetAvailableQuestDataFromGameMode();
 
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;

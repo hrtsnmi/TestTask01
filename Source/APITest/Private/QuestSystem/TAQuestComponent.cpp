@@ -75,7 +75,7 @@ bool UTAQuestComponent::SetOwnersQuest(FQuestData NewQuestData)
     bool bCanSetQuestInfo = OnSetQuestData.IsBound();
     if (bCanSetQuestInfo)
     {
-        OnSetQuestData.Execute(NewQuestData);
+        OnSetQuestData.Broadcast(NewQuestData);
     }
     
     return bCanSetQuestInfo;

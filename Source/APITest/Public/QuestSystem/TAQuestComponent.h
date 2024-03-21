@@ -8,7 +8,7 @@
 #include "TAQuestComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature)
-DECLARE_DELEGATE_OneParam(OnSetQuestDataSignature, FQuestData)
+DECLARE_MULTICAST_DELEGATE_OneParam(OnSetQuestDataSignature, FQuestData)
 
 class ATAPlayerState;
 

@@ -38,11 +38,11 @@ protected:
 
 
 private:
-    void SetQusetData(FQuestData NewQusetData);
-    FQuestData GetQusetData() const;
+    void SetQuestData(FQuestData NewQusetData);
+    FQuestData GetQuestData() const;
 
 public:
-
+    
     void SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent);
     OnQuestEndSignature OnQuestEnd;
 };
