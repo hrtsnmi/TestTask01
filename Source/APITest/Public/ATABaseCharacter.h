@@ -5,17 +5,18 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Interfaces/InteractableInterface.h"
 
 #include "ATABaseCharacter.generated.h"
 
 class UTAQuestComponent;
 
 UCLASS()
-class APITEST_API ATABaseCharacter : public ACharacter
+class APITEST_API ATABaseCharacter : public ACharacter, public IInteractableInterface
 {
 	GENERATED_BODY()
 
-		private:
+private:
     /** MappingContext */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     class UInputMappingContext* DefaultMappingContext;
@@ -28,10 +29,14 @@ class APITEST_API ATABaseCharacter : public ACharacter
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     class UInputAction* LookAction;
 
+    /** Interact Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    class UInputAction* InteractAction;
+
 private:
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
-
+    void Interact(const FInputActionValue& Value);
 
 public:
 	ATABaseCharacter();
@@ -46,4 +51,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UTAQuestComponent> QuestComponent;
 
+    
+protected:        //InteractableInterface
+    EInteractType CurrentInteractType;
+
+    FQuestData UnderInteract_Implementation();
+
+public: 
+    EInteractType GetInteractType_Implementation() const;
+    //void SetInteractType_Implementation(EInteractType InteractType);
 };

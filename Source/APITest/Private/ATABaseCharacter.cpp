@@ -15,6 +15,8 @@ ATABaseCharacter::ATABaseCharacter()
 
 	QuestComponent = CreateDefaultSubobject<UTAQuestComponent>(TEXT("QuestComponent"));
 
+    //InteractableInterface
+    CurrentInteractType = EInteractType::Master;
 }
 
 void ATABaseCharacter::BeginPlay()
@@ -26,6 +28,47 @@ void ATABaseCharacter::BeginPlay()
     {
         PState->SetupDelegatesForQuestComponent(QuestComponent);
         QuestComponent->SetupDelegatesForPlayerState(PState);
+    }
+}
+
+FQuestData ATABaseCharacter::UnderInteract_Implementation()
+{
+    return FQuestData();
+}
+
+EInteractType ATABaseCharacter::GetInteractType_Implementation() const
+{
+    return CurrentInteractType;
+}
+
+void ATABaseCharacter::Interact(const FInputActionValue& Value)
+{
+    bool bIsInteractStartes = Value.Get<bool>();
+    
+    if (bIsInteractStartes)
+    {
+        TArray<AActor*> QuestOwnerActors;
+        GetOverlappingActors(QuestOwnerActors, UInteractableInterface::StaticClass());
+
+        for (AActor* QuestOwnerActor : QuestOwnerActors)
+        {
+            FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
+            DistanceToActorNorm.Normalize();
+            if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
+            {
+                continue;
+            }
+
+            // this is pointed to Actor
+            if (CurrentInteractType == EInteractType::Slave ||
+                IInteractableInterface::Execute_GetInteractType(QuestOwnerActor) == EInteractType::Master)
+            {
+                continue;
+            }
+
+            // TODO: Get QuestData
+            IInteractableInterface::Execute_UnderInteract(QuestOwnerActor);
+        }
     }
 }
 
@@ -48,6 +91,7 @@ void ATABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
     EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Move);
     EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Look);
+    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ATABaseCharacter::Interact);
 }
 
 void ATABaseCharacter::Move(const FInputActionValue& Value)
