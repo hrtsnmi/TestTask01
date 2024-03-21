@@ -28,7 +28,12 @@ void ATABaseCharacter::BeginPlay()
     {
         PState->SetupDelegatesForQuestComponent(QuestComponent);
         QuestComponent->SetupDelegatesForPlayerState(PState);
+
+        FQuestData QuestData;
+        QuestData.Id = -1;
+        QuestComponent->SetOwnersQuest(QuestData);
     }
+
 }
 
 FQuestData ATABaseCharacter::UnderInteract_Implementation()
