@@ -7,6 +7,10 @@
 #include "QuestSystem/TAQuestManager.h"
 #include "TAQuestComponent.generated.h"
 
+DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature)
+DECLARE_DELEGATE_OneParam(OnSetQuestDataSignature, FQuestData)
+
+class ATAPlayerState;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class APITEST_API UTAQuestComponent : public UActorComponent
@@ -14,8 +18,6 @@ class APITEST_API UTAQuestComponent : public UActorComponent
 	GENERATED_BODY()
 
 private:
-    FQuestData CurrentQusetData;
-
 	void StartMoveTo();
     void StartFindItem();
 
@@ -34,5 +36,13 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	//Delegates for proccesing info of quest in PlayerState
+	OnGetQuestDataSignature OnGetQuestData;
+    OnSetQuestDataSignature OnSetQuestData;
+
+	bool GetOwnersQuest(FQuestData& OutQuestData) const;
+    bool SetOwnersQuest(FQuestData NewQuestData);
+
+	void SetupDelegatesForPlayerState(ATAPlayerState* PlayerState);
+
 };

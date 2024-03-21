@@ -3,6 +3,7 @@
 
 #include "ATABaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
+#include "TAPlayerState.h"
 
 ATABaseCharacter::ATABaseCharacter()
 {
@@ -16,6 +17,12 @@ void ATABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
+	if (ATAPlayerState* PState = GetController()->GetPlayerState<ATAPlayerState>())
+    {
+        PState->SetupDelegatesForQuestComponent(QuestComponent);
+        QuestComponent->SetupDelegatesForPlayerState(PState);
+    }
 }
 
 void ATABaseCharacter::Tick(float DeltaTime)
