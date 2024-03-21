@@ -67,7 +67,7 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
             }
 
             // TODO: Get QuestData
-            IInteractableInterface::Execute_UnderInteract(QuestOwnerActor);
+            QuestComponent->SetOwnersQuest(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
         }
     }
 }
@@ -80,18 +80,21 @@ void ATABaseCharacter::Tick(float DeltaTime)
 
 void ATABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    APlayerController* PlayerController = Cast<APlayerController>(GetController());
+    if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+    {
+        UEnhancedInputLocalPlayerSubsystem* Subsystem =
+            ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 
-    UEnhancedInputLocalPlayerSubsystem* Subsystem =
-        ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+        Subsystem->ClearAllMappings();
+        Subsystem->AddMappingContext(DefaultMappingContext, 0);
+    }
 
-    Subsystem->ClearAllMappings();
-    Subsystem->AddMappingContext(DefaultMappingContext, 0);
-
-    UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-    EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Move);
-    EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Look);
-    EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ATABaseCharacter::Interact);
+    if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Move);
+        EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Look);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ATABaseCharacter::Interact);
+    }
 }
 
 void ATABaseCharacter::Move(const FInputActionValue& Value)

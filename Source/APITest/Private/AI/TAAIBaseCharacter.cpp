@@ -27,7 +27,11 @@ void ATAAIBaseCharacter::BeginPlay()
 
 FQuestData ATAAIBaseCharacter::UnderInteract_Implementation()
 {
-    return FQuestData();
+    FQuestData TMPQuestData;
+    TMPQuestData.Id = -1;
+    QuestComponent->GetOwnersQuest(TMPQuestData);
+    
+    return TMPQuestData;
 }
 
 EInteractType ATAAIBaseCharacter::GetInteractType_Implementation() const

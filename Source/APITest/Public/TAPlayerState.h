@@ -14,18 +14,30 @@ DECLARE_DELEGATE_OneParam(OnQuestEndSignature, FQuestData)
     /**
  * 
  */
+
+UENUM() enum class EQuestProgress : uint8
+{
+    NONE    UMETA(DisplayName = "NONE"),
+    Started UMETA(DisplayName = "Started"),
+    Complited UMETA(DisplayName = "Complited")
+};
+
 UCLASS()
 class APITEST_API ATAPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-	
+
+
+ private:
+    FQuestData CurrentQuestData;
+    EQuestProgress OwnerHasActiveQuest;
+
 protected:
     /** Overridable native event for when play begins for this actor. */
     virtual void BeginPlay() override;
 
 
 private:
-    FQuestData CurrentQusetData;
     void SetQusetData(FQuestData NewQusetData);
     FQuestData GetQusetData() const;
 

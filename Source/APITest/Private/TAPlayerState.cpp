@@ -8,17 +8,31 @@ void ATAPlayerState::BeginPlay()
 {
     Super::BeginPlay();
 
-    CurrentQusetData.Id = -1;
+    OwnerHasActiveQuest = EQuestProgress::NONE;
 }
 
 void ATAPlayerState::SetQusetData(FQuestData NewQusetData)
 {
-    CurrentQusetData = NewQusetData;
+    switch (OwnerHasActiveQuest)
+    {
+        case EQuestProgress::NONE: 
+            CurrentQuestData = NewQusetData;
+            OwnerHasActiveQuest = EQuestProgress::Started;
+            break;
+        case EQuestProgress::Started: 
+
+            break;
+        case EQuestProgress::Complited:
+            OnQuestEnd.ExecuteIfBound(CurrentQuestData);
+            OwnerHasActiveQuest = EQuestProgress::NONE;
+            break;
+        default: break;
+    }  
 }
 
 FQuestData ATAPlayerState::GetQusetData() const
 {
-    return CurrentQusetData;
+    return CurrentQuestData;
 }
 
 void ATAPlayerState::SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent)
