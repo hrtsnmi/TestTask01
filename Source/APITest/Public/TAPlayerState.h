@@ -9,9 +9,7 @@
 
 class UTAQuestComponent;
 
-DECLARE_DELEGATE_OneParam(OnQuestEndSignature, FQuestData)
-
-    /**
+/**
  * 
  */
 
@@ -20,22 +18,18 @@ class APITEST_API ATAPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
-
  private:
     FQuestData CurrentQuestData;
-    EQuestProgress OwnerHasActiveQuest;
+    EQuestProgress CurrentQuestProggres;
 
 protected:
     /** Overridable native event for when play begins for this actor. */
     virtual void BeginPlay() override;
 
-
 private:
-    void SetQuestData(FQuestData NewQusetData);
+    void SetQuestData(FQuestData NewQuestData, AActor* NewProgress);
     FQuestData GetQuestData() const;
 
 public:
-    
     void SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent);
-    OnQuestEndSignature OnQuestEnd;
 };

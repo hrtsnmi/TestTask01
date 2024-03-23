@@ -12,11 +12,6 @@ UTAQuestComponent::UTAQuestComponent()
 void UTAQuestComponent::InitNewQuest(FQuestData QusetData)
 {
     // TO DO function that is called when a new quest starts and launches one of the scripts depending on its type
-    if (!SetOwnersQuest(QusetData))
-    {
-        return;
-    }
-
     switch (QusetData.QuestType)
     {
         case EQuestType::FindItem: 
@@ -41,8 +36,7 @@ void UTAQuestComponent::MarkSuccessQuset(FQuestData QusetData)
     }
 
     // state without Quest
-    CurrentQusetData.Id = -1;
-    if (!SetOwnersQuest(CurrentQusetData))
+    if (!SetOwnersQuest(CurrentQusetData, nullptr))
     {
         return;
     }
@@ -70,21 +64,21 @@ bool UTAQuestComponent::GetOwnersQuest(FQuestData& OutQuestData) const
     return bCanGetQuestInfo;
 }
 
-bool UTAQuestComponent::SetOwnersQuest(FQuestData NewQuestData)
+bool UTAQuestComponent::SetOwnersQuest(FQuestData NewQuestData, AActor* QuestGiver)
 {
     bool bCanSetQuestInfo = OnSetQuestData.IsBound();
     if (bCanSetQuestInfo)
     {
-        OnSetQuestData.Broadcast(NewQuestData);
+        OnSetQuestData.Broadcast(NewQuestData, QuestGiver);
     }
     
     return bCanSetQuestInfo;
 }
 
-void UTAQuestComponent::SetupDelegatesForPlayerState(ATAPlayerState* PlayerState)
-{
-    PlayerState->OnQuestEnd.BindUObject(this, &UTAQuestComponent::MarkSuccessQuset);
-}
+//void UTAQuestComponent::SetupDelegatesForPlayerState(ATAPlayerState* PlayerState)
+//{
+//    PlayerState->OnQuestEnd.BindUObject(this, &UTAQuestComponent::MarkSuccessQuset);
+//}
 
 
 void UTAQuestComponent::StartMoveTo()

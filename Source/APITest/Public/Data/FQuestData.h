@@ -9,9 +9,9 @@
 UENUM() enum class EQuestProgress : uint8
 {
     NONE UMETA(DisplayName = "NONE"),
-    GetFromManager UMETA(DisplayName = "Get From Manager"),
-    GetFromNPC UMETA(DisplayName = "Get From NPC"),
-    Complited UMETA(DisplayName = "Complited")
+    Get UMETA(DisplayName = "Get From Manager or NPC, depends on Interact State"),
+    Done UMETA(DisplayName = "Done, NPC when give Quest, Player when complite"),
+    Max UMETA(DisplayName = "Max")
 };
 
 UENUM()

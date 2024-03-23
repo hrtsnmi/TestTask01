@@ -4,16 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "../Gamemode/DeclaringDelegatesForQuestFlow.h"
+#include "../Interfaces/InteractableInterface.h"
+
 #include "TAPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class APITEST_API ATAPlayerController : public APlayerController
+class APITEST_API ATAPlayerController : public APlayerController, public IInteractableInterface
 {
 	GENERATED_BODY()
 	
 protected:
     virtual void OnPossess(APawn* InPawn) override;
+
+protected:  // InteractableInterface
+    EInteractType CurrentInteractType;
+    FQuestData UnderInteract_Implementation();
+
+public:
+    EInteractType GetInteractType_Implementation() const;
+    void SetInteractType_Implementation(EInteractType InteractType);
+
+public:  // Delegates For Gamemode
+    QuestFlowDelegates::OnQuestStartSignature OnQuestStart;
+    QuestFlowDelegates::OnQuestEndSignature OnQuestEnd;
 };

@@ -13,8 +13,6 @@ ATAAIBaseCharacter::ATAAIBaseCharacter()
 
 	QuestComponent = CreateDefaultSubobject<UTAQuestComponent>(TEXT("QuestComponent"));
 
-	CurrentInteractType = EInteractType::Slave;
-
     WorldWidget = CreateDefaultSubobject<UNPCWidgetComponent>(TEXT("World Widget"));
     WorldWidget->SetupAttachment(RootComponent);
     WorldWidget->SetVisibility(false);
@@ -38,27 +36,9 @@ void ATAAIBaseCharacter::BeginPlay()
         });
 }
 
-FQuestData ATAAIBaseCharacter::UnderInteract_Implementation()
+void ATAAIBaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver)
 {
-    static FQuestData TMPQuestData;
-    QuestComponent->GetOwnersQuest(TMPQuestData);
-    
-    return TMPQuestData;
-}
-
-EInteractType ATAAIBaseCharacter::GetInteractType_Implementation() const
-{
-    return CurrentInteractType;
-}
-
-void ATAAIBaseCharacter::SetInteractType_Implementation(EInteractType InteractType)
-{
-    CurrentInteractType = InteractType;
-}
-
-void ATAAIBaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData)
-{
-    QuestComponent->SetOwnersQuest(NewQuestData);
+    QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
 }
 
 void ATAAIBaseCharacter::Tick(float DeltaTime)

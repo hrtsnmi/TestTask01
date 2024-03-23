@@ -8,5 +8,23 @@ void ANPCAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
-    SetupQuestDataInPawn(InPawn);
+    if (ATABaseGameMode* GM = Cast<ATABaseGameMode>(GetWorld()->GetAuthGameMode()))
+    {
+        ForControllerSetup::SetupQuestDataInPawn(GM, InPawn);
+    }
+}
+
+FQuestData ANPCAIController::UnderInteract_Implementation()
+{
+    return FQuestData();
+}
+
+EInteractType ANPCAIController::GetInteractType_Implementation() const
+{
+    return CurrentInteractType;
+}
+
+void ANPCAIController::SetInteractType_Implementation(EInteractType InteractType)
+{
+    CurrentInteractType = InteractType;
 }

@@ -3,16 +3,20 @@
 
 #include "Gamemode/TABaseGameMode.h"
 #include "QuestSystem/TAQuestManager.h"
+#include "QuestSystem/TAQuestComponent.h"
 #include "Data/FQuestData.h"
 #include "Interfaces/InteractableInterface.h"
+#include "Interfaces/QuestComponentOwnerInterface.h"
+
+#include "Controllers/TAPlayerController.h"
+#include "Controllers/NPCAIController.h"
 //#include "Interfaces/ControllerBindDelegatesInterface.h"
 //#include "Interfaces/ControllerGetQuestDataInterface.h"
-
-
 
 ATABaseGameMode::ATABaseGameMode()
 {
     TAQuestManager = UTAQuestManager::GetInstance();
+
 }
 
 
@@ -27,29 +31,12 @@ void ATABaseGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
 
-    //GetPlayerController
-
     //Controller takes data delegates
-
-    //if has custom player state
-    //if (ATAPlayerState* PS = NewPlayer->GetPlayerState<ATAPlayerState>())
-    //{
-    //    if (!NewPlayer->GetClass()->ImplementsInterface(UControllerBindDelegatesInterface::StaticClass()))
-    //    {
-    //        return;
-    //    }
-
-    //    IControllerBindDelegatesInterface::Execute_SetDataForBinding(NewPlayer, PS);
-
-    //    //Send NewAvailableQuest
-
-    //    if (!TAQuestManager || !NewPlayer->GetClass()->ImplementsInterface(UControllerGetQuestDataInterface::StaticClass()))
-    //    {
-    //        return;
-    //    }
-
-    //    IControllerGetQuestDataInterface::Execute_SetQuestData(NewPlayer, TAQuestManager->GetAvailableQuest());
-    //}    
+    if (ANPCAIController* TAPlayerController = Cast<ANPCAIController>(NewPlayer))
+    {
+        TAPlayerController->OnQuestStart.BindUObject(this, &ATABaseGameMode::UpdateStartQuestProgress);
+        TAPlayerController->OnQuestEnd.BindUObject(this, &ATABaseGameMode::UpdateEndQuestProgress);
+    }  
 }
 
 FQuestData ATABaseGameMode::GetAvailableQuest() const
@@ -58,3 +45,28 @@ FQuestData ATABaseGameMode::GetAvailableQuest() const
 
     return TAQuestManager ? (TAQuestManager->GetAvailableQuest()) : (NewQuestData);
 }
+
+void ATABaseGameMode::SetupDelegatesForQuestComponent(AController* QuestController)
+{
+    if (ANPCAIController* NPCController = Cast<ANPCAIController>(QuestController))
+    {
+        NPCController->OnQuestStart.BindUObject(this, &ATABaseGameMode::UpdateStartQuestProgress);
+        NPCController->OnQuestEnd.BindUObject(this, &ATABaseGameMode::UpdateEndQuestProgress);
+    }
+}
+
+void ATABaseGameMode::SetNewQuestData(
+    bool hasQuestComponentOwnerInterface, APawn* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker)
+{
+    if (!hasQuestComponentOwnerInterface)
+    {
+        return;
+    }
+
+    IQuestComponentOwnerInterface::Execute_SetDataInComponent(QuestComponentOwner, NewQuestData, QuestTaker);
+}
+
+
+void ATABaseGameMode::UpdateStartQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent) {}
+
+void ATABaseGameMode::UpdateEndQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent) {}

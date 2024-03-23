@@ -34,7 +34,7 @@ private:
 
 private:
     UFUNCTION()
-    void UpdateQuestInfo(FQuestData QuestData);
+    void UpdateQuestInfo(FQuestData QuestData, AActor* QuestGiver);
 
 public:
     void SetupQuestComponentDelegates(UTAQuestComponent* QuestComponent);

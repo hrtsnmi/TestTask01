@@ -3,6 +3,7 @@
 
 #include "ATABaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
+#include "Interfaces/InteractableInterface.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -13,8 +14,6 @@ ATABaseCharacter::ATABaseCharacter()
 
 	QuestComponent = CreateDefaultSubobject<UTAQuestComponent>(TEXT("QuestComponent"));
 
-    //InteractableInterface
-    CurrentInteractType = EInteractType::Master;
 }
 
 void ATABaseCharacter::BeginPlay()
@@ -23,54 +22,62 @@ void ATABaseCharacter::BeginPlay()
 	
 }
 
-FQuestData ATABaseCharacter::UnderInteract_Implementation()
+void ATABaseCharacter::AvailableToBeginQuest(APawn* QuestOwnerPawn)
 {
-    return FQuestData();
+    AController* QuestOwnerController = QuestOwnerPawn->GetController();
+    if (!GetController()->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()) ||
+        !QuestOwnerController->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()))
+    {
+        return;
+    }
+
+    if (IInteractableInterface::Execute_GetInteractType(GetController()) == EInteractType::Slave ||
+        IInteractableInterface::Execute_GetInteractType(QuestOwnerController) == EInteractType::Master)
+    {
+        return;
+    }
+
+    // TODO: Ask GameMode for starting New Quest
+
+    SetDataInComponent_Implementation(IInteractableInterface::Execute_UnderInteract(QuestOwnerPawn), QuestOwnerPawn);
 }
 
-EInteractType ATABaseCharacter::GetInteractType_Implementation() const
+void ATABaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver)
 {
-    return CurrentInteractType;
-}
-
-void ATABaseCharacter::SetInteractType_Implementation(EInteractType InteractType)
-{
-    CurrentInteractType = InteractType;
-}
-
-void ATABaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData)
-{
-    QuestComponent->SetOwnersQuest(NewQuestData);
+    QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
 }
 
 void ATABaseCharacter::Interact(const FInputActionValue& Value)
 {
     bool bIsInteractStartes = Value.Get<bool>();
-    
-    if (bIsInteractStartes)
+
+    if (!bIsInteractStartes)
     {
-        TArray<AActor*> QuestOwnerActors;
-        GetOverlappingActors(QuestOwnerActors, UInteractableInterface::StaticClass());
+        return;
+    }
 
-        for (AActor* QuestOwnerActor : QuestOwnerActors)
+    TArray<AActor*> QuestOwnerActors;
+    GetOverlappingActors(QuestOwnerActors, UQuestComponentOwnerInterface::StaticClass());
+
+    for (AActor* QuestOwnerActor : QuestOwnerActors)
+    {
+        if (QuestOwnerActor == this)
         {
-            FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
-            DistanceToActorNorm.Normalize();
-            if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
-            {
-                continue;
-            }
+            continue;
+        }
 
-            // this is pointed to Actor
-            if (CurrentInteractType == EInteractType::Slave ||
-                IInteractableInterface::Execute_GetInteractType(QuestOwnerActor) == EInteractType::Master)
-            {
-                continue;
-            }
+        FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
+        DistanceToActorNorm.Normalize();
+        if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
+        {
+            continue;
+        }
 
-            // TODO: Get QuestData
-            SetDataInComponent_Implementation(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
-            //QuestComponent->SetOwnersQuest(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
+        if (APawn* QuestOwnerPawn = Cast<APawn>(QuestOwnerActor))
+        {
+            AvailableToBeginQuest(QuestOwnerPawn);
+
+            break;
         }
     }
 }

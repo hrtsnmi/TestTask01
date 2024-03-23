@@ -6,7 +6,7 @@
 #include "AI/TAAIBaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
 
-void UNPCInfoWidget::UpdateQuestInfo(FQuestData QuestData)
+void UNPCInfoWidget::UpdateQuestInfo(FQuestData QuestData, AActor* QuestGiver)
 {
     
     if (QuestData.Id == -1)
@@ -48,6 +48,6 @@ void UNPCInfoWidget::SetupQuestComponentDelegates(UTAQuestComponent* QuestCompon
     FQuestData QuestData;
     if (QuestComponent->GetOwnersQuest(QuestData))
     {
-        UpdateQuestInfo(QuestData);
+        UpdateQuestInfo(QuestData, nullptr);
     }
 }

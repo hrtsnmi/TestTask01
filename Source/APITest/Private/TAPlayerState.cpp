@@ -3,37 +3,31 @@
 
 #include "TAPlayerState.h"
 #include "QuestSystem/TAQuestComponent.h"
+#include "Interfaces/InteractableInterface.h"
 
 void ATAPlayerState::BeginPlay()
 {
     Super::BeginPlay();
 
-    OwnerHasActiveQuest = EQuestProgress::NONE;
 }
 
-void ATAPlayerState::SetQuestData(FQuestData NewQusetData)
+void ATAPlayerState::SetQuestData(FQuestData NewQuestData, AActor* QuestGiver)
 {
-    //TODO:
-    switch (OwnerHasActiveQuest)
+    // TODO:
+    const bool bIsSlaveInteractType = QuestGiver
+                                          ? (QuestGiver->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass())
+                                                    ? (IInteractableInterface::Execute_GetInteractType(QuestGiver) == EInteractType::Slave)
+                                                    : (false))
+                                          : (false);
+    switch (CurrentQuestProggres)
     {
         case EQuestProgress::NONE:
-            CurrentQuestData = NewQusetData;
-            
-            // TODO:
-            //Choose in which way we Get Quest
-            OwnerHasActiveQuest = EQuestProgress::Started;
+            CurrentQuestData = NewQuestData;
+            CurrentQuestProggres = bIsSlaveInteractType ? (EQuestProgress::Get) : (EQuestProgress::Done);
             break;
-        case EQuestProgress::GetFromManager:
-            
-            OwnerHasActiveQuest = EQuestProgress::NONE;
-            break;
-        case EQuestProgress::GetFromNPC:
-            //Cant Get New Quest till end already taken one
-            break;
-        case EQuestProgress::Complited:
-            OnQuestEnd.ExecuteIfBound(CurrentQuestData);
-            OwnerHasActiveQuest = EQuestProgress::NONE;
-            break;
+        case EQuestProgress::Get: CurrentQuestProggres = bIsSlaveInteractType ? (EQuestProgress::Done) : (EQuestProgress::Get); break;
+        case EQuestProgress::Done: CurrentQuestProggres = EQuestProgress::NONE; break;
+        case EQuestProgress::Max: break;
         default: break;
     }
 }

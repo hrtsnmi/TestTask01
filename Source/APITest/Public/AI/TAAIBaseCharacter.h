@@ -14,7 +14,7 @@ class USphereToShowWidgetComponent;
 class UNPCWidgetComponent;
 
 UCLASS()
-class APITEST_API ATAAIBaseCharacter : public ACharacter, public IInteractableInterface, public IQuestComponentOwnerInterface
+class APITEST_API ATAAIBaseCharacter : public ACharacter, public IQuestComponentOwnerInterface
 {
 	GENERATED_BODY()
 
@@ -41,16 +41,7 @@ protected:
 protected:
     //void GetAvailableQuestDataFromGameMode();
 
-protected:  // InteractableInterface
-    EInteractType CurrentInteractType;
-
-    FQuestData UnderInteract_Implementation();
-
-public:
-    EInteractType GetInteractType_Implementation() const;
-    void SetInteractType_Implementation(EInteractType InteractType);
-
 public:  // IQuestComponentOwnerInterface
     UTAQuestComponent* GetQuestComponent_Implementation() const { return QuestComponent; }
-    void SetDataInComponent_Implementation(FQuestData NewQuestData);
+    void SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver);
 };

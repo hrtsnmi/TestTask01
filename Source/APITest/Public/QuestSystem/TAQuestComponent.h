@@ -7,10 +7,14 @@
 #include "Data/FQuestData.h"
 #include "TAQuestComponent.generated.h"
 
-DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature)
-DECLARE_MULTICAST_DELEGATE_OneParam(OnSetQuestDataSignature, FQuestData)
-
 class ATAPlayerState;
+
+DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature);
+DECLARE_MULTICAST_DELEGATE_TwoParams(OnSetQuestDataSignature, FQuestData, AActor*);
+
+
+
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class APITEST_API UTAQuestComponent : public UActorComponent
@@ -41,8 +45,7 @@ public:
     OnSetQuestDataSignature OnSetQuestData;
 
 	bool GetOwnersQuest(FQuestData& OutQuestData) const;
-    bool SetOwnersQuest(FQuestData NewQuestData);
+    bool SetOwnersQuest(FQuestData NewQuestData, AActor* QuestGiver);
 
-	void SetupDelegatesForPlayerState(ATAPlayerState* PlayerState);
-
+	//void SetupDelegatesForPlayerState(ATAPlayerState* PlayerState);
 };
