@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "../Data/FQuestData.h"
-#include "QuestComponentOwnerInterface.generated.h"
+#include "ControllerGetQuestDataInterface.generated.h"
 
-class UTAQuestComponent;
 // This class does not need to be modified.
+
 UINTERFACE(MinimalAPI)
-class UQuestComponentOwnerInterface : public UInterface
+class UControllerGetQuestDataInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -18,12 +18,12 @@ class UQuestComponentOwnerInterface : public UInterface
 /**
  * 
  */
-class APITEST_API IQuestComponentOwnerInterface
+class APITEST_API IControllerGetQuestDataInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) UTAQuestComponent* GetQuestComponent() const;
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) void SetDataInComponent(FQuestData NewQuestData);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable) void SetQuestData(FQuestData QuestData) const;
 };

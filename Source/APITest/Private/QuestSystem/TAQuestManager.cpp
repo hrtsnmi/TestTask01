@@ -4,6 +4,7 @@
 #include "QuestSystem/TAQuestManager.h"
 #include "Misc/Paths.h"
 #include "QuestSystem/ReadJson.h"
+#include "Data/FQuestData.h"
 
 UTAQuestManager* UTAQuestManager::SingletonInstance = nullptr;
 

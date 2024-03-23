@@ -44,4 +44,10 @@ void UNPCInfoWidget::UpdateQuestInfo(FQuestData QuestData)
 void UNPCInfoWidget::SetupQuestComponentDelegates(UTAQuestComponent* QuestComponent)
 {
     QuestComponent->OnSetQuestData.AddUObject(this, &UNPCInfoWidget::UpdateQuestInfo);
+
+    FQuestData QuestData;
+    if (QuestComponent->GetOwnersQuest(QuestData))
+    {
+        UpdateQuestInfo(QuestData);
+    }
 }

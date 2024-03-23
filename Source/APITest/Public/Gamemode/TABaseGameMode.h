@@ -9,14 +9,23 @@
 /**
  * 
  */
+class UTAQuestManager;
 UCLASS()
 class APITEST_API ATABaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+private:
+    UTAQuestManager* TAQuestManager{nullptr};
 
 public:
     ATABaseGameMode();
 
     virtual void StartPlay() override;
+
+protected:
+    virtual void PostLogin(APlayerController* NewPlayer) override;
+
+ public:
+    FQuestData GetAvailableQuest() const;
 };

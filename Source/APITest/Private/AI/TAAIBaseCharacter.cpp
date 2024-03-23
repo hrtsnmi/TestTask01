@@ -3,7 +3,6 @@
 
 #include "AI/TAAIBaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
-#include "TAPlayerState.h"
 #include "Components/SphereToShowWidgetComponent.h"
 #include "Components/NPCWidgetComponent.h"
 
@@ -28,19 +27,6 @@ void ATAAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-    
-
-    if (ATAPlayerState* PState = GetController()->GetPlayerState<ATAPlayerState>())
-    {
-        PState->SetupDelegatesForQuestComponent(QuestComponent);
-        QuestComponent->SetupDelegatesForPlayerState(PState);
-    }
-
-    if (CurrentInteractType == EInteractType::Slave)
-    {
-        QuestComponent->SetOwnersQuest(UTAQuestManager::GetInstance()->GetAvailableQuest());
-    }
-
     SphereComp->OnGotWidgetVisibility.BindLambda([this]() -> bool
         {
             return WorldWidget ? (WorldWidget->IsVisible()) : (false);
@@ -54,8 +40,7 @@ void ATAAIBaseCharacter::BeginPlay()
 
 FQuestData ATAAIBaseCharacter::UnderInteract_Implementation()
 {
-    FQuestData TMPQuestData;
-    TMPQuestData.Id = -1;
+    static FQuestData TMPQuestData;
     QuestComponent->GetOwnersQuest(TMPQuestData);
     
     return TMPQuestData;
@@ -64,6 +49,16 @@ FQuestData ATAAIBaseCharacter::UnderInteract_Implementation()
 EInteractType ATAAIBaseCharacter::GetInteractType_Implementation() const
 {
     return CurrentInteractType;
+}
+
+void ATAAIBaseCharacter::SetInteractType_Implementation(EInteractType InteractType)
+{
+    CurrentInteractType = InteractType;
+}
+
+void ATAAIBaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData)
+{
+    QuestComponent->SetOwnersQuest(NewQuestData);
 }
 
 void ATAAIBaseCharacter::Tick(float DeltaTime)

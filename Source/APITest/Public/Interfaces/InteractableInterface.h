@@ -4,16 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "../QuestSystem/TAQuestManager.h"
+#include "Data/FQuestData.h"
 #include "InteractableInterface.generated.h"
-
-
-UENUM()
-enum class EInteractType : uint8
-{
-    Master  UMETA(DisplayName = "Can Interact"),
-    Slave   UMETA(DisplayName = "Can Be Interact")
-};
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -35,6 +27,5 @@ protected:
 
 public:
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable) EInteractType GetInteractType() const;
-    
-    //UFUNCTION(BlueprintNativeEvent, BlueprintCallable) void SetInteractType(EInteractType InteractType);
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) void SetInteractType(EInteractType InteractType);
 };

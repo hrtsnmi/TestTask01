@@ -6,8 +6,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-#include "TAPlayerState.h"
-
 
 ATABaseCharacter::ATABaseCharacter()
 {
@@ -23,17 +21,6 @@ void ATABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
-	if (ATAPlayerState* PState = GetController()->GetPlayerState<ATAPlayerState>())
-    {
-        PState->SetupDelegatesForQuestComponent(QuestComponent);
-        QuestComponent->SetupDelegatesForPlayerState(PState);
-
-        FQuestData QuestData;
-        QuestData.Id = -1;
-        QuestComponent->SetOwnersQuest(QuestData);
-    }
-
 }
 
 FQuestData ATABaseCharacter::UnderInteract_Implementation()
@@ -44,6 +31,16 @@ FQuestData ATABaseCharacter::UnderInteract_Implementation()
 EInteractType ATABaseCharacter::GetInteractType_Implementation() const
 {
     return CurrentInteractType;
+}
+
+void ATABaseCharacter::SetInteractType_Implementation(EInteractType InteractType)
+{
+    CurrentInteractType = InteractType;
+}
+
+void ATABaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData)
+{
+    QuestComponent->SetOwnersQuest(NewQuestData);
 }
 
 void ATABaseCharacter::Interact(const FInputActionValue& Value)
@@ -72,7 +69,8 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
             }
 
             // TODO: Get QuestData
-            QuestComponent->SetOwnersQuest(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
+            SetDataInComponent_Implementation(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
+            //QuestComponent->SetOwnersQuest(IInteractableInterface::Execute_UnderInteract(QuestOwnerActor));
         }
     }
 }

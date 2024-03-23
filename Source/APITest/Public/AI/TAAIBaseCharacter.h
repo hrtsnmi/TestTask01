@@ -48,8 +48,9 @@ protected:  // InteractableInterface
 
 public:
     EInteractType GetInteractType_Implementation() const;
-    // void SetInteractType_Implementation(EInteractType InteractType);
+    void SetInteractType_Implementation(EInteractType InteractType);
 
- public:  // IQuestComponentOwnerInterface
+public:  // IQuestComponentOwnerInterface
     UTAQuestComponent* GetQuestComponent_Implementation() const { return QuestComponent; }
+    void SetDataInComponent_Implementation(FQuestData NewQuestData);
 };
