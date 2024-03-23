@@ -13,21 +13,29 @@ void ATAPlayerState::BeginPlay()
 
 void ATAPlayerState::SetQuestData(FQuestData NewQusetData)
 {
+    //TODO:
     switch (OwnerHasActiveQuest)
     {
-        case EQuestProgress::NONE: 
+        case EQuestProgress::NONE:
             CurrentQuestData = NewQusetData;
+            
+            // TODO:
+            //Choose in which way we Get Quest
             OwnerHasActiveQuest = EQuestProgress::Started;
             break;
-        case EQuestProgress::Started: 
-
+        case EQuestProgress::GetFromManager:
+            
+            OwnerHasActiveQuest = EQuestProgress::NONE;
+            break;
+        case EQuestProgress::GetFromNPC:
+            //Cant Get New Quest till end already taken one
             break;
         case EQuestProgress::Complited:
             OnQuestEnd.ExecuteIfBound(CurrentQuestData);
             OwnerHasActiveQuest = EQuestProgress::NONE;
             break;
         default: break;
-    }  
+    }
 }
 
 FQuestData ATAPlayerState::GetQuestData() const

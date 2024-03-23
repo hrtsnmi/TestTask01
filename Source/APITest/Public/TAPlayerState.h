@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "QuestSystem/TAQuestManager.h"
+#include "Data/FQuestData.h"
 #include "TAPlayerState.generated.h"
 
 class UTAQuestComponent;
@@ -14,13 +14,6 @@ DECLARE_DELEGATE_OneParam(OnQuestEndSignature, FQuestData)
     /**
  * 
  */
-
-UENUM() enum class EQuestProgress : uint8
-{
-    NONE    UMETA(DisplayName = "NONE"),
-    Started UMETA(DisplayName = "Started"),
-    Complited UMETA(DisplayName = "Complited")
-};
 
 UCLASS()
 class APITEST_API ATAPlayerState : public APlayerState

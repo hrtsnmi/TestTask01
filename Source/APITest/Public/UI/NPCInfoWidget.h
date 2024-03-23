@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "../QuestSystem/TAQuestManager.h"
+#include "../Data/FQuestData.h"
 #include "NPCInfoWidget.generated.h"
 
 /**

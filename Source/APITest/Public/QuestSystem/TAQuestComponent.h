@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "QuestSystem/TAQuestManager.h"
+#include "Data/FQuestData.h"
 #include "TAQuestComponent.generated.h"
 
 DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature)

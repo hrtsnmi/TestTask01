@@ -6,6 +6,14 @@
 
 #include "FQuestData.generated.h"
 
+UENUM() enum class EQuestProgress : uint8
+{
+    NONE UMETA(DisplayName = "NONE"),
+    GetFromManager UMETA(DisplayName = "Get From Manager"),
+    GetFromNPC UMETA(DisplayName = "Get From NPC"),
+    Complited UMETA(DisplayName = "Complited")
+};
+
 UENUM()
 enum class EQuestType : uint8
 {
