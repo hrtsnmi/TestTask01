@@ -3,39 +3,50 @@
 
 #include "Components/SphereToShowWidgetComponent.h"
 #include "Interfaces/InteractableInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 
 void USphereToShowWidgetComponent::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp,
     int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    if (GetOwner() == OtherActor || !OtherActor)
+    if (GetOwner() == OtherActor)
     {
         return;
     }
 
-    if (OnGotWidgetVisibility.IsBound())
+    if (!OnGotWidgetVisibility.IsBound())
     {
-        WatchActorInRangeToShowWidget(OtherActor, OnGotWidgetVisibility.Execute());
+        return;
+    }
+
+    if (APawn* OtherPawn = Cast<APawn>(OtherActor))
+    {
+        WatchActorInRangeToShowWidget(OtherPawn->GetController(), OnGotWidgetVisibility.Execute());
     }
 }
 
 void USphereToShowWidgetComponent::ComponentEndOverlap(
     UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    if (GetOwner() == OtherActor || !OtherActor)
+    if (GetOwner() == OtherActor)
     {
         return;
     }
 
-    if (OnGotWidgetVisibility.IsBound())
+    if (!OnGotWidgetVisibility.IsBound())
     {
-        WatchActorInRangeToShowWidget(OtherActor, OnGotWidgetVisibility.Execute());
+        return;
+    }
+    
+    if (APawn* OtherPawn = Cast<APawn>(OtherActor))
+    {
+        WatchActorInRangeToShowWidget(OtherPawn->GetController(), OnGotWidgetVisibility.Execute());
     }
 }
 
 void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AActor* OtherActor, bool bIsWidgetVisible)
 {
-    if (!OtherActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()))
+    if (!HasInterfaceChecker::HasInteractableInterface(OtherActor))
     {
         return;
     }

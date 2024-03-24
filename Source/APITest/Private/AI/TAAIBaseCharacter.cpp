@@ -36,9 +36,14 @@ void ATAAIBaseCharacter::BeginPlay()
         });
 }
 
-void ATAAIBaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver)
+bool ATAAIBaseCharacter::SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver)
 {
-    QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
+    return QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
+}
+
+bool ATAAIBaseCharacter::GetDataFromComponent(FQuestData& OutData)
+{
+    return QuestComponent->GetOwnersQuest(OutData);
 }
 
 void ATAAIBaseCharacter::Tick(float DeltaTime)

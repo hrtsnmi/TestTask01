@@ -4,6 +4,7 @@
 #include "TAPlayerState.h"
 #include "QuestSystem/TAQuestComponent.h"
 #include "Interfaces/InteractableInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 
 void ATAPlayerState::BeginPlay()
 {
@@ -11,14 +12,14 @@ void ATAPlayerState::BeginPlay()
 
 }
 
-void ATAPlayerState::SetQuestData(FQuestData NewQuestData, AActor* QuestGiver)
+void ATAPlayerState::SetQuestData(const FQuestData& NewQuestData, AActor* QuestGiver)
 {
     // TODO:
-    const bool bIsSlaveInteractType = QuestGiver
-                                          ? (QuestGiver->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass())
-                                                    ? (IInteractableInterface::Execute_GetInteractType(QuestGiver) == EInteractType::Slave)
-                                                    : (false))
-                                          : (false);
+    
+    const bool bIsSlaveInteractType = HasInterfaceChecker::HasInteractableInterface(QuestGiver)
+                                          ? IInteractableInterface::Execute_GetInteractType(QuestGiver) == EInteractType::Slave
+                                          : false;
+                                                 
     switch (CurrentQuestProggres)
     {
         case EQuestProgress::NONE:
@@ -32,7 +33,7 @@ void ATAPlayerState::SetQuestData(FQuestData NewQuestData, AActor* QuestGiver)
     }
 }
 
-FQuestData ATAPlayerState::GetQuestData() const
+const FQuestData& ATAPlayerState::GetQuestData() const
 {
     return CurrentQuestData;
 }

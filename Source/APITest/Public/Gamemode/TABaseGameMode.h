@@ -10,7 +10,6 @@
  * 
  */
 class UTAQuestManager;
-class UTAQuestComponent;
 
 UCLASS()
 class APITEST_API ATABaseGameMode : public AGameMode
@@ -21,12 +20,9 @@ private:
     UTAQuestManager* TAQuestManager{nullptr};
 
 private:
-    AActor* NPC{nullptr};
-    AActor* Player{nullptr};
-
-private:
-    void UpdateStartQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent);
-    void UpdateEndQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent);
+    void UpdateQuestFlow(AController* PlayerController, AController* NPCController, bool bIsStart = true);
+    void UpdateStartQuestProgress(AController* PlayerController, AController* NPCController);
+    void UpdateEndQuestProgress(AController* PlayerController, AController* NPCController);
 
 public:
     ATABaseGameMode();
@@ -39,7 +35,7 @@ protected:
  public:
     FQuestData GetAvailableQuest() const;
 
-    void SetupDelegatesForQuestComponent(AController* QuestController);
+    void SetupDelegatesForQuestComponent(AController* PlayerController);
 
-    void SetNewQuestData(bool hasQuestComponentOwnerInterface, APawn* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker);
+    void SetNewQuestData(bool hasQuestComponentOwnerInterface, AActor* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker);
 };

@@ -43,5 +43,7 @@ protected:
 
 public:  // IQuestComponentOwnerInterface
     UTAQuestComponent* GetQuestComponent_Implementation() const { return QuestComponent; }
-    void SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver);
+    
+    bool SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver);
+    bool GetDataFromComponent(FQuestData& OutData);
 };

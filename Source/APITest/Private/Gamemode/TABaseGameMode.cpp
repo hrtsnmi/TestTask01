@@ -3,10 +3,11 @@
 
 #include "Gamemode/TABaseGameMode.h"
 #include "QuestSystem/TAQuestManager.h"
-#include "QuestSystem/TAQuestComponent.h"
 #include "Data/FQuestData.h"
+
 #include "Interfaces/InteractableInterface.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 
 #include "Controllers/TAPlayerController.h"
 #include "Controllers/NPCAIController.h"
@@ -32,11 +33,7 @@ void ATABaseGameMode::PostLogin(APlayerController* NewPlayer)
     Super::PostLogin(NewPlayer);
 
     //Controller takes data delegates
-    if (ANPCAIController* TAPlayerController = Cast<ANPCAIController>(NewPlayer))
-    {
-        TAPlayerController->OnQuestStart.BindUObject(this, &ATABaseGameMode::UpdateStartQuestProgress);
-        TAPlayerController->OnQuestEnd.BindUObject(this, &ATABaseGameMode::UpdateEndQuestProgress);
-    }  
+    SetupDelegatesForQuestComponent(NewPlayer);
 }
 
 FQuestData ATABaseGameMode::GetAvailableQuest() const
@@ -53,10 +50,15 @@ void ATABaseGameMode::SetupDelegatesForQuestComponent(AController* QuestControll
         NPCController->OnQuestStart.BindUObject(this, &ATABaseGameMode::UpdateStartQuestProgress);
         NPCController->OnQuestEnd.BindUObject(this, &ATABaseGameMode::UpdateEndQuestProgress);
     }
+    else if (ATAPlayerController* TAPlayerController = Cast<ATAPlayerController>(QuestController))
+    {
+        TAPlayerController->OnQuestStart.BindUObject(this, &ATABaseGameMode::UpdateStartQuestProgress);
+        TAPlayerController->OnQuestEnd.BindUObject(this, &ATABaseGameMode::UpdateEndQuestProgress);
+    }
 }
 
 void ATABaseGameMode::SetNewQuestData(
-    bool hasQuestComponentOwnerInterface, APawn* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker)
+    bool hasQuestComponentOwnerInterface, AActor* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker)
 {
     if (!hasQuestComponentOwnerInterface)
     {
@@ -67,6 +69,63 @@ void ATABaseGameMode::SetNewQuestData(
 }
 
 
-void ATABaseGameMode::UpdateStartQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent) {}
+void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController* NPCController, bool bIsStart)
+{
+    // Set Actors which interacts to start Quest
+    static bool PlayerWantsToStartQuest{false};
+    static AActor* NPC{nullptr};
+    static AActor* Player{nullptr};
 
-void ATABaseGameMode::UpdateEndQuestProgress(UTAQuestComponent* PlayerComponent, UTAQuestComponent* NPCComponent) {}
+    if (PlayerWantsToStartQuest)  // Called by NPC - second time
+    {
+        if (!(Player == PlayerController->GetPawn()) || !(NPC == NPCController->GetPawn()))
+        {
+            return;
+        }
+
+        // can start quest with data in NPC
+        FQuestData Buffer;
+        bool canGetQuest = IInteractableInterface::Execute_UnderInteract(NPCController, Buffer);
+        if (!canGetQuest)
+        {
+            return;
+        }
+
+        SetNewQuestData(HasInterfaceChecker::HasQuestComponentOwnerInterface(Player), Player, Buffer, NPC);
+
+        // Set Empty Data for NPC
+        SetNewQuestData(HasInterfaceChecker::HasQuestComponentOwnerInterface(NPC), NPC,
+            bIsStart ? FQuestData() : TAQuestManager->GetAvailableQuest(), this);
+
+        if (!bIsStart)
+        {
+            Player = nullptr;
+            NPC = nullptr;
+        }
+    }
+    else  // Called by Player - first time
+    {
+        if (bIsStart)
+        {
+            Player = PlayerController->GetPawn();
+            NPC = NPCController->GetPawn();
+        }
+        else
+        {
+            //TODO: Check If Player Finish Quest
+
+        }
+    }
+
+    PlayerWantsToStartQuest = !PlayerWantsToStartQuest;
+}
+
+void ATABaseGameMode::UpdateStartQuestProgress(AController* PlayerController, AController* NPCController)
+{
+    UpdateQuestFlow(PlayerController, NPCController);
+}
+
+void ATABaseGameMode::UpdateEndQuestProgress(AController* PlayerController, AController* NPCController)
+{
+    UpdateQuestFlow(PlayerController, NPCController, false);
+}

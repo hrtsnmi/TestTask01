@@ -4,6 +4,7 @@
 #include "UI/PlayerHUD.h"
 #include "UI/NPCInfoWidget.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 
 void APlayerHUD::BeginPlay()
 {
@@ -12,7 +13,7 @@ void APlayerHUD::BeginPlay()
     CurrentWidget = CreateWidget<UNPCInfoWidget>(GetWorld(), HUD);
     CurrentWidget->AddToViewport();
 
-    if (GetOwningPawn()->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()))
+    if (HasInterfaceChecker::HasQuestComponentOwnerInterface(GetOwningPawn()))
     {
         CurrentWidget->SetupQuestComponentDelegates(IQuestComponentOwnerInterface::Execute_GetQuestComponent(GetOwningPawn()));
     }

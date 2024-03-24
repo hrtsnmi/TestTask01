@@ -22,11 +22,14 @@ protected:
 
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;
-    FQuestData UnderInteract_Implementation();
+    bool UnderInteract(FQuestData& OutData);
 
 public:
     EInteractType GetInteractType_Implementation() const;
     void SetInteractType_Implementation(EInteractType InteractType);
+
+    void StartQuest_Implementation(AController* NPCController);
+    void EndQuest_Implementation(AController* NPCController);
 
 public:  // Delegates For Gamemode
     QuestFlowDelegates::OnQuestStartSignature OnQuestStart;

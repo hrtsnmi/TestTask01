@@ -4,6 +4,7 @@
 #include "ATABaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
 #include "Interfaces/InteractableInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -25,26 +26,20 @@ void ATABaseCharacter::BeginPlay()
 void ATABaseCharacter::AvailableToBeginQuest(APawn* QuestOwnerPawn)
 {
     AController* QuestOwnerController = QuestOwnerPawn->GetController();
-    if (!GetController()->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()) ||
-        !QuestOwnerController->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()))
-    {
-        return;
-    }
 
-    if (IInteractableInterface::Execute_GetInteractType(GetController()) == EInteractType::Slave ||
-        IInteractableInterface::Execute_GetInteractType(QuestOwnerController) == EInteractType::Master)
-    {
-        return;
-    }
-
-    // TODO: Ask GameMode for starting New Quest
-
-    SetDataInComponent_Implementation(IInteractableInterface::Execute_UnderInteract(QuestOwnerPawn), QuestOwnerPawn);
+    // TODO: Ask Controllers to start New Quest
+    IInteractableInterface::Execute_StartQuest(GetController(), QuestOwnerController);
+    //IInteractableInterface::Execute_StartQuest(QuestOwnerController);
 }
 
-void ATABaseCharacter::SetDataInComponent_Implementation(FQuestData NewQuestData, AActor* QuestGiver)
+bool ATABaseCharacter::SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver)
 {
-    QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
+    return QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
+}
+
+bool ATABaseCharacter::GetDataFromComponent(FQuestData& OutData)
+{  
+    return QuestComponent->GetOwnersQuest(OutData);
 }
 
 void ATABaseCharacter::Interact(const FInputActionValue& Value)
@@ -61,25 +56,44 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
 
     for (AActor* QuestOwnerActor : QuestOwnerActors)
     {
-        if (QuestOwnerActor == this)
-        {
-            continue;
-        }
-
-        FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
-        DistanceToActorNorm.Normalize();
-        if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
-        {
-            continue;
-        }
-
         if (APawn* QuestOwnerPawn = Cast<APawn>(QuestOwnerActor))
         {
-            AvailableToBeginQuest(QuestOwnerPawn);
+            if (QuestOwnerActor == this)
+            {
+                continue;
+            }
 
-            break;
+            FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
+            DistanceToActorNorm.Normalize();
+            if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
+            {
+                continue;
+            }
+
+            if (TryToSendRequestToStartQuest(QuestOwnerPawn->GetController()))
+            {
+                break;
+            }
+            else
+            {
+                continue;
+            }
         }
     }
+}
+
+bool ATABaseCharacter::TryToSendRequestToStartQuest(AController* NPCController)
+{
+    bool ControllersHasInteractableInterface =
+        HasInterfaceChecker::HasInteractableInterface(GetController()) && HasInterfaceChecker::HasInteractableInterface(NPCController);
+
+    if (ControllersHasInteractableInterface)
+    {
+        IInteractableInterface::Execute_StartQuest(GetController(), NPCController);
+        IInteractableInterface::Execute_StartQuest(NPCController, GetController());
+    }
+
+    return ControllersHasInteractableInterface;
 }
 
 void ATABaseCharacter::Tick(float DeltaTime)

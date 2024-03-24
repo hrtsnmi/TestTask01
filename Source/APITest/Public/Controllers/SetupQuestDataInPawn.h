@@ -1,33 +1,31 @@
 #pragma once
 #include "../Interfaces/QuestComponentOwnerInterface.h"
 #include "../Interfaces/InteractableInterface.h"
+#include "../Interfaces/HasInterfaceChecker.h"
 #include "../Gamemode/TABaseGameMode.h"
 #include "../Data/FQuestData.h"
 #include "../TAPlayerState.h"
-#include "../QuestSystem/TAQuestComponent.h"
 
 namespace ForControllerSetup
 {
-void SetupQuestDataInPawn(ATABaseGameMode* GM, APawn* InPawn, bool bIsMasterInteract = false)
+void SetupQuestDataInPawn(ATABaseGameMode* GM, AController* InController, bool bIsMasterInteract = false)
 {
     // TODO: Set Quest Data to QuestComponent
     if (!bIsMasterInteract)
     {
-        GM->SetupDelegatesForQuestComponent(InPawn->GetController());
+        GM->SetupDelegatesForQuestComponent(InController);
     }
 
-    bool hasInterface = InPawn->GetController()->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass());
-
-    if (!hasInterface)
+    if (!HasInterfaceChecker::HasInteractableInterface(InController))
     {
         return;
     }
 
-    IInteractableInterface::Execute_SetInteractType(
-        InPawn->GetController(), bIsMasterInteract ? EInteractType::Master : EInteractType::Slave);
+    IInteractableInterface::Execute_SetInteractType(InController, bIsMasterInteract ? EInteractType::Master : EInteractType::Slave);
 
-    hasInterface = InPawn->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass());
-    if (!hasInterface)
+    APawn* InPawn = InController->GetPawn();
+    bool hasQuestComponentOwnerInterface = HasInterfaceChecker::HasQuestComponentOwnerInterface(InPawn);
+    if (!hasQuestComponentOwnerInterface)
     {
         return;
     }
@@ -35,15 +33,14 @@ void SetupQuestDataInPawn(ATABaseGameMode* GM, APawn* InPawn, bool bIsMasterInte
     // SetDelegate
     // TODO: Connecct Delegates in Quest Component
     //      To StartQuest, End Quest
-    UTAQuestComponent* QuestComponent = IQuestComponentOwnerInterface::Execute_GetQuestComponent(InPawn);
 
-    if (ATAPlayerState* PState = InPawn->GetController()->GetPlayerState<ATAPlayerState>())
+    if (ATAPlayerState* PState = InController->GetPlayerState<ATAPlayerState>())
     {
-        PState->SetupDelegatesForQuestComponent(QuestComponent);
+        PState->SetupDelegatesForQuestComponent(IQuestComponentOwnerInterface::Execute_GetQuestComponent(InPawn));
     }
 
     // Set Data
     FQuestData QuestData;
-    GM->SetNewQuestData(hasInterface, InPawn, bIsMasterInteract ? QuestData : GM->GetAvailableQuest(), GM);
+    GM->SetNewQuestData(hasQuestComponentOwnerInterface, InPawn, bIsMasterInteract ? QuestData : GM->GetAvailableQuest(), GM);
 }
 }  // namespace ForControllerSetup

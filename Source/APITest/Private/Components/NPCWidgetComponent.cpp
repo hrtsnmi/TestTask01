@@ -3,13 +3,14 @@
 
 #include "Components/NPCWidgetComponent.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 #include "UI/NPCInfoWidget.h"
 
 void UNPCWidgetComponent::BeginPlay()
 {
     Super::BeginPlay();
-
-    if (HUD && GetOwner()->GetClass()->ImplementsInterface(UQuestComponentOwnerInterface::StaticClass()))
+    
+    if (HUD && HasInterfaceChecker::HasQuestComponentOwnerInterface(GetOwner()))
     {
         CurrentWidget = CreateWidget<UNPCInfoWidget>(GetWorld(), HUD);
         SetWidget(CurrentWidget);

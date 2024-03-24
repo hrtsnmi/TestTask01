@@ -27,8 +27,8 @@ protected:
     virtual void BeginPlay() override;
 
 private:
-    void SetQuestData(FQuestData NewQuestData, AActor* NewProgress);
-    FQuestData GetQuestData() const;
+    void SetQuestData(const FQuestData& NewQuestData, AActor* QuestGiver);
+    const FQuestData& GetQuestData() const;
 
 public:
     void SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent);

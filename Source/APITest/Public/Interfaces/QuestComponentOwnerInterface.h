@@ -25,5 +25,6 @@ class APITEST_API IQuestComponentOwnerInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable) UTAQuestComponent* GetQuestComponent() const;
-    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) void SetDataInComponent(FQuestData NewQuestData, AActor* QuestGiver);
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) bool SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver);
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable) bool GetDataFromComponent(FQuestData& OutData);
 };

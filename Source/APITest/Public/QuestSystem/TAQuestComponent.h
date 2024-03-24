@@ -4,15 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../Gamemode/DeclaringDelegatesForQuestFlow.h"
 #include "Data/FQuestData.h"
 #include "TAQuestComponent.generated.h"
 
 class ATAPlayerState;
-
-DECLARE_DELEGATE_RetVal(FQuestData, OnGetQuestDataSignature);
-DECLARE_MULTICAST_DELEGATE_TwoParams(OnSetQuestDataSignature, FQuestData, AActor*);
-
-
 
 
 
@@ -41,11 +37,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	//Delegates for proccesing info of quest in PlayerState
-	OnGetQuestDataSignature OnGetQuestData;
-    OnSetQuestDataSignature OnSetQuestData;
+    QuestFlowDelegates::OnGetQuestDataSignature OnGetQuestData;
+    QuestFlowDelegates::OnSetQuestDataSignature OnSetQuestData;
 
 	bool GetOwnersQuest(FQuestData& OutQuestData) const;
     bool SetOwnersQuest(FQuestData NewQuestData, AActor* QuestGiver);
-
-	//void SetupDelegatesForPlayerState(ATAPlayerState* PlayerState);
 };

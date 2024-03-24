@@ -3,6 +3,8 @@
 
 #include "Controllers/TAPlayerController.h"
 #include "Controllers/SetupQuestDataInPawn.h"
+#include "Interfaces/QuestComponentOwnerInterface.h"
+#include "Interfaces/HasInterfaceChecker.h"
 
 
 void ATAPlayerController::OnPossess(APawn* InPawn)
@@ -11,13 +13,13 @@ void ATAPlayerController::OnPossess(APawn* InPawn)
 
     if (ATABaseGameMode* GM = Cast<ATABaseGameMode>(InPawn->GetWorld()->GetAuthGameMode()))
     {
-        ForControllerSetup::SetupQuestDataInPawn(GM, InPawn, true);
+        ForControllerSetup::SetupQuestDataInPawn(GM, this, true);
     }
 }
 
-FQuestData ATAPlayerController::UnderInteract_Implementation()
+bool ATAPlayerController::UnderInteract(FQuestData& OutData)
 {
-    return FQuestData();
+    return false;
 }
 
 EInteractType ATAPlayerController::GetInteractType_Implementation() const
@@ -29,3 +31,11 @@ void ATAPlayerController::SetInteractType_Implementation(EInteractType InteractT
 {
     CurrentInteractType = InteractType;
 }
+
+void ATAPlayerController::StartQuest_Implementation(AController* NPCController)
+{
+    OnQuestStart.ExecuteIfBound(this, NPCController);
+}
+
+void ATAPlayerController::EndQuest_Implementation(AController* NPCController) {}
+
