@@ -20,8 +20,7 @@ bool GameModeFunctions::CheckIfGameModeCanStartsQuest(
            (NPC == NPCController->GetPawn());
 }
 
-bool GameModeFunctions::CheckIfGameModeCanEndsQuest(
-    AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController)
+bool GameModeFunctions::CheckIfGameModeCanEndsQuest(AActor* Player, AActor* WhoCompletedQuest)
 {
-    return true;
+    return Player == WhoCompletedQuest;
 }

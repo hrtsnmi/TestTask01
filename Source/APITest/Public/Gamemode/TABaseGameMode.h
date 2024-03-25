@@ -12,6 +12,8 @@
  * 
  */
 class UTAQuestManager;
+class ASpamActor;
+
 struct FQuestData;
 
 UCLASS()
@@ -19,6 +21,15 @@ class APITEST_API ATABaseGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+private:
+    AActor* WhoCompletedQuest{nullptr};
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpamActors|For Move To Quest", meta = (AllowPrivateAccess = "true"))
+    TSubclassOf<ASpamActor> MoveToSubClass;
+
+     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpamActors|For Find Item Quest", meta = (AllowPrivateAccess = "true"))
+    TSubclassOf<ASpamActor> FindItemSubClass;
+
 private:
     UTAQuestManager* TAQuestManager{nullptr};
 

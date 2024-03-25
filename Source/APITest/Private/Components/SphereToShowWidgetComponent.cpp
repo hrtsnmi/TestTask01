@@ -44,7 +44,7 @@ void USphereToShowWidgetComponent::ComponentEndOverlap(
     }
 }
 
-void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AActor* OtherActor, bool bIsWidgetVisible)
+void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AController* OtherActor, bool bIsWidgetVisible)
 {
     if (!HasInterfaceChecker::HasInteractableInterface(OtherActor))
     {
@@ -54,7 +54,7 @@ void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AActor* OtherAc
     bool Visability = false;
     if (bIsWidgetVisible)
     {
-        Visability = WatchedActor != OtherActor;
+        Visability = WatchedActor != OtherActor->GetPawn();
 
         WatchedActor = nullptr;
     }
@@ -63,7 +63,7 @@ void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AActor* OtherAc
         Visability = IInteractableInterface::Execute_GetInteractType(OtherActor) == EInteractType::Master;
         if (Visability)
         {
-            WatchedActor = OtherActor;
+            WatchedActor = OtherActor->GetPawn();
         }
     }
 

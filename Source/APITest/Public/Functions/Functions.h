@@ -42,7 +42,7 @@ namespace GameModeFunctions
 {
 
 bool CheckIfGameModeCanStartsQuest(AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController);
-bool CheckIfGameModeCanEndsQuest(AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController);
+bool CheckIfGameModeCanEndsQuest(AActor* Player, AActor* WhoCompletedQuest);
 
 }
 

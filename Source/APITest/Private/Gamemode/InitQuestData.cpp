@@ -20,11 +20,6 @@ void ATABaseGameMode::InitQuestData(AController* InController, bool bIsMasterInt
         return;
     }
 
-    // SetDelegate
-    // TODO: Connecct Delegates in Quest Component
-    //      To StartQuest, End Quest
-
-
     //Set Delegates in PlayerState
     if (ATAPlayerState* PState = InController->GetPlayerState<ATAPlayerState>())
     {

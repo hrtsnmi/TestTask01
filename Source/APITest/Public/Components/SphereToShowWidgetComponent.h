@@ -28,7 +28,7 @@ private:
     void ComponentEndOverlap(
         UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-    void WatchActorInRangeToShowWidget(AActor* OtherActor, bool bIsWidgetVisible);
+    void WatchActorInRangeToShowWidget(AController* OtherActor, bool bIsWidgetVisible);
 
 protected:
     virtual void BeginPlay() override;
@@ -36,4 +36,6 @@ protected:
 public:
     OnGotWidgetVisibilitySignature OnGotWidgetVisibility;
     OnSetWidgetVisibilitySignature OnSetWidgetVisibility;
+
+    AActor* GetWatchedActor() const { return WatchedActor; }
 };
