@@ -2,6 +2,7 @@
 
 #include "Data/FQuestData.h"
 #include "TAPlayerState.h"
+#include "QuestSystem/TAQuestComponent.h"
 
 UTAQuestComponent::UTAQuestComponent()
 {
@@ -15,10 +16,10 @@ void UTAQuestComponent::InitNewQuest(FQuestData QusetData)
     switch (QusetData.QuestType)
     {
         case EQuestType::FindItem: 
-            StartFindItem();
+            //StartFindItem();
             break;
         case EQuestType::MoveTo: 
-            StartMoveTo();
+            //StartMoveTo();
             break;
         default: break;
     }
@@ -29,17 +30,17 @@ void UTAQuestComponent::MarkSuccessQuset(FQuestData QusetData)
 {
     // TO DO function that is called when a quest is completed and ATAPlayerState is notified about the successful completion of the quest
 
-    FQuestData CurrentQusetData;
-    if (!GetOwnersQuest(CurrentQusetData) || CurrentQusetData.Id != QusetData.Id)
-    {
-        return;
-    }
+    //FQuestData CurrentQusetData;
+    //if (!GetOwnersQuest(CurrentQusetData) || CurrentQusetData.Id != QusetData.Id)
+    //{
+    //    return;
+    //}
 
-    // state without Quest
-    if (!SetOwnersQuest(CurrentQusetData, nullptr))
-    {
-        return;
-    }
+    //// state without Quest
+    //if (!SetOwnersQuest(CurrentQusetData, nullptr))
+    //{
+    //    return;
+    //}
 }
 
 void UTAQuestComponent::BeginPlay()
@@ -53,40 +54,25 @@ void UTAQuestComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-bool UTAQuestComponent::GetOwnersQuest(FQuestData& OutQuestData) const
+bool UTAQuestComponent::GetOwnersQuest(FQuestData& OutQuestData, EQuestProgress& OutQuestProgress) const
 {
-    bool bCanGetQuestInfo = OnGetQuestData.IsBound();
+    bool bCanGetQuestInfo = OnGetQuestData.IsBound() && OnGetQuestProgress.IsBound();
     if (bCanGetQuestInfo)
     {
         OutQuestData = OnGetQuestData.Execute();
+        OutQuestProgress = OnGetQuestProgress.Execute();
     }
 
     return bCanGetQuestInfo;
 }
 
-bool UTAQuestComponent::SetOwnersQuest(FQuestData NewQuestData, AActor* QuestGiver)
+bool UTAQuestComponent::SetOwnersQuest(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
     bool bCanSetQuestInfo = OnSetQuestData.IsBound();
     if (bCanSetQuestInfo)
     {
-        OnSetQuestData.Broadcast(NewQuestData, QuestGiver);
+        OnSetQuestData.Broadcast(NewQuestData, NewQuestProgress, QuestGiver);
     }
-    
+
     return bCanSetQuestInfo;
-}
-
-//void UTAQuestComponent::SetupDelegatesForPlayerState(ATAPlayerState* PlayerState)
-//{
-//    PlayerState->OnQuestEnd.BindUObject(this, &UTAQuestComponent::MarkSuccessQuset);
-//}
-
-
-void UTAQuestComponent::StartMoveTo()
-{
-
-}
-
-void UTAQuestComponent::StartFindItem()
-{
-
 }

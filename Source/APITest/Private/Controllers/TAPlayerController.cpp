@@ -2,24 +2,20 @@
 
 
 #include "Controllers/TAPlayerController.h"
-#include "Controllers/SetupQuestDataInPawn.h"
-#include "Interfaces/QuestComponentOwnerInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
+#include "Data/FQuestData.h"
 
 
 void ATAPlayerController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
-    if (ATABaseGameMode* GM = Cast<ATABaseGameMode>(InPawn->GetWorld()->GetAuthGameMode()))
-    {
-        ForControllerSetup::SetupQuestDataInPawn(GM, this, true);
-    }
+    ControllersFunctions::OnPossess(InPawn);
 }
 
-bool ATAPlayerController::UnderInteract(FQuestData& OutData)
+bool ATAPlayerController::UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress)
 {
-    return false;
+    return ControllersFunctions::UnderInteract(this, OutData, OutProgress);
 }
 
 EInteractType ATAPlayerController::GetInteractType_Implementation() const
@@ -32,10 +28,34 @@ void ATAPlayerController::SetInteractType_Implementation(EInteractType InteractT
     CurrentInteractType = InteractType;
 }
 
-void ATAPlayerController::StartQuest_Implementation(AController* NPCController)
+bool ATAPlayerController::CanStartQuest_Implementation()
 {
-    OnQuestStart.ExecuteIfBound(this, NPCController);
+    return ControllersFunctions::CanPawnStartQuest(GetPawn(), CurrentInteractType);
 }
 
-void ATAPlayerController::EndQuest_Implementation(AController* NPCController) {}
+bool ATAPlayerController::CanEndQuest_Implementation()
+{
+    return false;
+}
+
+void ATAPlayerController::PawnTryToStartNewQuest_Implementation(AController* OtherInteractController)
+{
+    ControllersFunctions::PawnTryToStartNewQuest(this, OtherInteractController, OnQuestStart);
+}
+
+void ATAPlayerController::PawnTryToEndQuest_Implementation(AController* OtherInteractController) {}
+
+   
+
+EQuestProgress ATAPlayerController::UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver)
+{
+    return ControllersFunctions::UpdateQuestProgress(this, CurrentProgress, QuestGiver);
+}
+
+void ATAPlayerController::PostProccessQuestProgress_Implementation(EQuestProgress QuestProgress)
+{
+    ControllersFunctions::PostProccessQuestProgress(this, QuestProgress);
+}
+
+
 

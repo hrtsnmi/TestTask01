@@ -3,18 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "../Interfaces/InteractableInterface.h"
-#include "../Interfaces/QuestComponentOwnerInterface.h"
+#include "../CharacterWithQuestComponent/CharacterWithQuestComponent.h"
 
 #include "TAAIBaseCharacter.generated.h"
 
-class UTAQuestComponent;
 class USphereToShowWidgetComponent;
 class UNPCWidgetComponent;
 
 UCLASS()
-class APITEST_API ATAAIBaseCharacter : public ACharacter, public IQuestComponentOwnerInterface
+class APITEST_API ATAAIBaseCharacter : public ACharacterWithQuestComponent
 {
 	GENERATED_BODY()
 
@@ -23,27 +20,15 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-
 private: //Widget
     UPROPERTY(EditInstanceOnly, Category = "Widget", meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UNPCWidgetComponent> WorldWidget;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+    TObjectPtr<USphereToShowWidgetComponent> SphereComp;
 
 protected:
 
 	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    TObjectPtr<UTAQuestComponent> QuestComponent;
     
-    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-    TObjectPtr<USphereToShowWidgetComponent> SphereComp;
-
-protected:
-    //void GetAvailableQuestDataFromGameMode();
-
-public:  // IQuestComponentOwnerInterface
-    UTAQuestComponent* GetQuestComponent_Implementation() const { return QuestComponent; }
-    
-    bool SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver);
-    bool GetDataFromComponent(FQuestData& OutData);
 };

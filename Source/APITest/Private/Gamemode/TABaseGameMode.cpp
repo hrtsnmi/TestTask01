@@ -2,12 +2,13 @@
 
 
 #include "Gamemode/TABaseGameMode.h"
+
 #include "QuestSystem/TAQuestManager.h"
 #include "Data/FQuestData.h"
+#include "TAPlayerState.h"
 
 #include "Interfaces/InteractableInterface.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
 
 #include "Controllers/TAPlayerController.h"
 #include "Controllers/NPCAIController.h"
@@ -25,7 +26,6 @@ void ATABaseGameMode::StartPlay()
 {
     Super::StartPlay();
 
-    //GetWorld()->GetPlayerControllerIterator
 }
 
 void ATABaseGameMode::PostLogin(APlayerController* NewPlayer)
@@ -35,6 +35,17 @@ void ATABaseGameMode::PostLogin(APlayerController* NewPlayer)
     //Controller takes data delegates
     SetupDelegatesForQuestComponent(NewPlayer);
 }
+
+void ATABaseGameMode::SetInteractType(AController* InController, bool bIsMasterInteract)
+{
+    if (!HasInterfaceChecker::HasInteractableInterface(InController))
+    {
+        return;
+    }
+
+    IInteractableInterface::Execute_SetInteractType(InController, bIsMasterInteract ? EInteractType::Master : EInteractType::Slave);
+}
+
 
 FQuestData ATABaseGameMode::GetAvailableQuest() const
 {
@@ -58,44 +69,30 @@ void ATABaseGameMode::SetupDelegatesForQuestComponent(AController* QuestControll
 }
 
 void ATABaseGameMode::SetNewQuestData(
-    bool hasQuestComponentOwnerInterface, AActor* QuestComponentOwner, FQuestData NewQuestData, AActor* QuestTaker)
+    AController* QuestController, const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestTaker)
 {
-    if (!hasQuestComponentOwnerInterface)
+    // Set New Progress Type for pawn
+    if (!HasInterfaceChecker::HasQuestComponentOwnerInterface(QuestController->GetPawn()))
     {
         return;
     }
 
-    IQuestComponentOwnerInterface::Execute_SetDataInComponent(QuestComponentOwner, NewQuestData, QuestTaker);
+    IQuestComponentOwnerInterface::Execute_SetDataInComponent(QuestController->GetPawn(), NewQuestData, NewQuestProgress, QuestTaker);
 }
-
 
 void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController* NPCController, bool bIsStart)
 {
     // Set Actors which interacts to start Quest
     static bool PlayerWantsToStartQuest{false};
-    static AActor* NPC{nullptr};
-    static AActor* Player{nullptr};
+    static APawn* NPC{nullptr};
+    static APawn* Player{nullptr};
 
     if (PlayerWantsToStartQuest)  // Called by NPC - second time
     {
-        if (!(Player == PlayerController->GetPawn()) || !(NPC == NPCController->GetPawn()))
+        if (GameModeFunctions::CheckIfGameModeCanStartsQuest(Player, NPC, PlayerController, NPCController))
         {
-            return;
+            GameModeStartsQuest(Player, NPC);
         }
-
-        // can start quest with data in NPC
-        FQuestData Buffer;
-        bool canGetQuest = IInteractableInterface::Execute_UnderInteract(NPCController, Buffer);
-        if (!canGetQuest)
-        {
-            return;
-        }
-
-        SetNewQuestData(HasInterfaceChecker::HasQuestComponentOwnerInterface(Player), Player, Buffer, NPC);
-
-        // Set Empty Data for NPC
-        SetNewQuestData(HasInterfaceChecker::HasQuestComponentOwnerInterface(NPC), NPC,
-            bIsStart ? FQuestData() : TAQuestManager->GetAvailableQuest(), this);
 
         if (!bIsStart)
         {
@@ -115,6 +112,8 @@ void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController
             //TODO: Check If Player Finish Quest
 
         }
+
+        //UpdatePlayerRequest(PlayerController, bIsStart);
     }
 
     PlayerWantsToStartQuest = !PlayerWantsToStartQuest;

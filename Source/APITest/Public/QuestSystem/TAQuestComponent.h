@@ -18,8 +18,8 @@ class APITEST_API UTAQuestComponent : public UActorComponent
 	GENERATED_BODY()
 
 private:
-	void StartMoveTo();
-    void StartFindItem();
+	//void StartMoveTo();
+    //void StartFindItem();
 
 public:	
 	UTAQuestComponent();
@@ -39,7 +39,9 @@ public:
 	//Delegates for proccesing info of quest in PlayerState
     QuestFlowDelegates::OnGetQuestDataSignature OnGetQuestData;
     QuestFlowDelegates::OnSetQuestDataSignature OnSetQuestData;
+    QuestFlowDelegates::OnGetQuestProgressSignature OnGetQuestProgress;
 
-	bool GetOwnersQuest(FQuestData& OutQuestData) const;
-    bool SetOwnersQuest(FQuestData NewQuestData, AActor* QuestGiver);
+	bool GetOwnersQuest(FQuestData& OutQuestData, EQuestProgress& OutQuestProgress) const;
+    bool SetOwnersQuest(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver);
+   
 };

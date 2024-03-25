@@ -2,32 +2,19 @@
 
 
 #include "Controllers/NPCAIController.h"
-#include "Controllers/SetupQuestDataInPawn.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
 
 void ANPCAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);
 
-    if (ATABaseGameMode* GM = Cast<ATABaseGameMode>(GetWorld()->GetAuthGameMode()))
-    {
-        ForControllerSetup::SetupQuestDataInPawn(GM, this);
-    }
+    ControllersFunctions::OnPossess(InPawn);
 }
 
-bool ANPCAIController::UnderInteract(FQuestData& OutData)
+bool ANPCAIController::UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress)
 {
-    bool canGetData = HasInterfaceChecker::HasQuestComponentOwnerInterface(GetPawn())
-                          ? IQuestComponentOwnerInterface::Execute_GetDataFromComponent(GetPawn(), OutData)
-                          : false;
-
-    if (canGetData)
-    {
-        //Pawn can Give a quest
-    }
-
-    return canGetData;
+    return ControllersFunctions::UnderInteract(this, OutData, OutProgress);
 }
 
 EInteractType ANPCAIController::GetInteractType_Implementation() const
@@ -40,9 +27,30 @@ void ANPCAIController::SetInteractType_Implementation(EInteractType InteractType
     CurrentInteractType = InteractType;
 }
 
-void ANPCAIController::StartQuest_Implementation(AController* PlayerController) 
+bool ANPCAIController::CanStartQuest_Implementation()
 {
-    OnQuestStart.ExecuteIfBound(PlayerController, this);
+    return ControllersFunctions::CanPawnStartQuest(GetPawn(), CurrentInteractType);
 }
 
-void ANPCAIController::EndQuest_Implementation(AController* PlayerController) {}
+bool ANPCAIController::CanEndQuest_Implementation()
+{
+    return false;
+}
+
+void ANPCAIController::PawnTryToStartNewQuest_Implementation(AController* OtherInteractController)
+{
+    OnQuestStart.ExecuteIfBound(OtherInteractController, this);
+}
+
+void ANPCAIController::PawnTryToEndQuest_Implementation(AController* OtherInteractPawn) {}
+
+EQuestProgress ANPCAIController::UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver)
+{
+    return ControllersFunctions::UpdateQuestProgress(this, CurrentProgress, QuestGiver);
+}
+
+void ANPCAIController::PostProccessQuestProgress_Implementation(EQuestProgress QuestProgress)
+{
+    ControllersFunctions::PostProccessQuestProgress(this, QuestProgress);
+}
+

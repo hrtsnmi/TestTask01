@@ -4,7 +4,7 @@
 #include "UI/PlayerHUD.h"
 #include "UI/NPCInfoWidget.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 
 void APlayerHUD::BeginPlay()
 {

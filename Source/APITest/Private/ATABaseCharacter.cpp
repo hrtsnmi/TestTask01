@@ -2,9 +2,8 @@
 
 
 #include "ATABaseCharacter.h"
-#include "QuestSystem/TAQuestComponent.h"
 #include "Interfaces/InteractableInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
@@ -13,33 +12,12 @@ ATABaseCharacter::ATABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	QuestComponent = CreateDefaultSubobject<UTAQuestComponent>(TEXT("QuestComponent"));
-
 }
 
 void ATABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ATABaseCharacter::AvailableToBeginQuest(APawn* QuestOwnerPawn)
-{
-    AController* QuestOwnerController = QuestOwnerPawn->GetController();
-
-    // TODO: Ask Controllers to start New Quest
-    IInteractableInterface::Execute_StartQuest(GetController(), QuestOwnerController);
-    //IInteractableInterface::Execute_StartQuest(QuestOwnerController);
-}
-
-bool ATABaseCharacter::SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver)
-{
-    return QuestComponent->SetOwnersQuest(NewQuestData, QuestGiver);
-}
-
-bool ATABaseCharacter::GetDataFromComponent(FQuestData& OutData)
-{  
-    return QuestComponent->GetOwnersQuest(OutData);
 }
 
 void ATABaseCharacter::Interact(const FInputActionValue& Value)
@@ -89,8 +67,8 @@ bool ATABaseCharacter::TryToSendRequestToStartQuest(AController* NPCController)
 
     if (ControllersHasInteractableInterface)
     {
-        IInteractableInterface::Execute_StartQuest(GetController(), NPCController);
-        IInteractableInterface::Execute_StartQuest(NPCController, GetController());
+        IInteractableInterface::Execute_PawnTryToStartNewQuest(GetController(), NPCController);
+        IInteractableInterface::Execute_PawnTryToStartNewQuest(NPCController, GetController());
     }
 
     return ControllersHasInteractableInterface;

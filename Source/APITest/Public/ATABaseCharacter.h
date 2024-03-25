@@ -3,16 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "CharacterWithQuestComponent/CharacterWithQuestComponent.h"
 #include "InputActionValue.h"
-#include "Interfaces/QuestComponentOwnerInterface.h"
 
 #include "ATABaseCharacter.generated.h"
 
-class UTAQuestComponent;
 
 UCLASS()
-class APITEST_API ATABaseCharacter : public ACharacter, public IQuestComponentOwnerInterface
+class APITEST_API ATABaseCharacter : public ACharacterWithQuestComponent
 {
 	GENERATED_BODY()
 
@@ -51,16 +49,5 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-	TObjectPtr<UTAQuestComponent> QuestComponent;
-
- protected:
-    void AvailableToBeginQuest(APawn* QuestOwnerPawn);
-
-public:  // IQuestComponentOwnerInterface
-    UTAQuestComponent* GetQuestComponent_Implementation() const { return QuestComponent; }
-
-    bool SetDataInComponent(const FQuestData& NewQuestData, AActor* QuestGiver);
-    bool GetDataFromComponent(FQuestData& OutData);
 
 };

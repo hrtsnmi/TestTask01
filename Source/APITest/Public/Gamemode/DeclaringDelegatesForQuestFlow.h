@@ -10,6 +10,9 @@ DECLARE_DELEGATE_TwoParams(OnQuestEndSignature, AController*, AController*);
 
 // Delegates forPlayerState
 DECLARE_DELEGATE_RetVal(const FQuestData&, OnGetQuestDataSignature);
-DECLARE_MULTICAST_DELEGATE_TwoParams(OnSetQuestDataSignature, const FQuestData&, AActor*);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(OnSetQuestDataSignature, const FQuestData&, EQuestProgress , AActor*);
+
+
+DECLARE_DELEGATE_RetVal(EQuestProgress, OnGetQuestProgressSignature);
 
 }  // namespace QuestFlowDelegates

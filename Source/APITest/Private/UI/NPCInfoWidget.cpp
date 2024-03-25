@@ -6,10 +6,10 @@
 #include "AI/TAAIBaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
 
-void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& QuestData, AActor* QuestGiver)
+void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
     
-    if (QuestData.Id == -1)
+    if (NewQuestData.Id == -1)
     {
         static const FName NoQuest = FName(TEXT("Quest is unavailable "));
         TB_ID->SetText(FText::FromName(NoQuest));
@@ -27,16 +27,16 @@ void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& QuestData, AActor* QuestG
         static const FName FindItem = FName(TEXT("FindItem"));
         static const FName MoveTo = FName(TEXT("MoveTo"));
 
-        FString tmpString = ID.ToString() + FString::FromInt(QuestData.Id);
+        FString tmpString = ID.ToString() + FString::FromInt(NewQuestData.Id);
         TB_ID->SetText(FText::FromString(tmpString));
 
-        tmpString = QuestDesc.ToString() + QuestData.QuestDesc;
+        tmpString = QuestDesc.ToString() + NewQuestData.QuestDesc;
         TB_QuestDesc->SetText(FText::FromString(tmpString));
 
-        tmpString = QuestType.ToString() + (QuestData.QuestType == EQuestType::FindItem ? (FindItem.ToString()) : (MoveTo.ToString()));
+        tmpString = QuestType.ToString() + (NewQuestData.QuestType == EQuestType::FindItem ? (FindItem.ToString()) : (MoveTo.ToString()));
         TB_QuestType->SetText(FText::FromString(tmpString));
 
-        tmpString = TargetLocation.ToString() + QuestData.TargetLocation.ToString();
+        tmpString = TargetLocation.ToString() + NewQuestData.TargetLocation.ToString();
         TB_TargetLocation->SetText(FText::FromString(tmpString));
     }
 }
@@ -46,8 +46,10 @@ void UNPCInfoWidget::SetupQuestComponentDelegates(UTAQuestComponent* QuestCompon
     QuestComponent->OnSetQuestData.AddUObject(this, &UNPCInfoWidget::UpdateQuestInfo);
 
     FQuestData QuestData;
-    if (QuestComponent->GetOwnersQuest(QuestData))
+    EQuestProgress EQuestProgress;
+    
+    if (QuestComponent->GetOwnersQuest(QuestData, EQuestProgress))
     {
-        UpdateQuestInfo(QuestData, nullptr);
+        UpdateQuestInfo(QuestData, EQuestProgress, nullptr);
     }
 }

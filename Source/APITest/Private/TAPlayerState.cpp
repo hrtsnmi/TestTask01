@@ -4,7 +4,7 @@
 #include "TAPlayerState.h"
 #include "QuestSystem/TAQuestComponent.h"
 #include "Interfaces/InteractableInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 
 void ATAPlayerState::BeginPlay()
 {
@@ -12,25 +12,10 @@ void ATAPlayerState::BeginPlay()
 
 }
 
-void ATAPlayerState::SetQuestData(const FQuestData& NewQuestData, AActor* QuestGiver)
+void ATAPlayerState::SetQuestData(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
-    // TODO:
-    
-    const bool bIsSlaveInteractType = HasInterfaceChecker::HasInteractableInterface(QuestGiver)
-                                          ? IInteractableInterface::Execute_GetInteractType(QuestGiver) == EInteractType::Slave
-                                          : false;
-                                                 
-    switch (CurrentQuestProggres)
-    {
-        case EQuestProgress::NONE:
-            CurrentQuestData = NewQuestData;
-            CurrentQuestProggres = bIsSlaveInteractType ? (EQuestProgress::Get) : (EQuestProgress::Done);
-            break;
-        case EQuestProgress::Get: CurrentQuestProggres = bIsSlaveInteractType ? (EQuestProgress::Done) : (EQuestProgress::Get); break;
-        case EQuestProgress::Done: CurrentQuestProggres = EQuestProgress::NONE; break;
-        case EQuestProgress::Max: break;
-        default: break;
-    }
+    CurrentQuestData = NewQuestData;
+    CurrentQuestProgress = NewQuestProgress;
 }
 
 const FQuestData& ATAPlayerState::GetQuestData() const
@@ -42,4 +27,6 @@ void ATAPlayerState::SetupDelegatesForQuestComponent(UTAQuestComponent* QuestCom
 {
     QuestComponent->OnGetQuestData.BindUObject(this, &ATAPlayerState::GetQuestData);
     QuestComponent->OnSetQuestData.AddUObject(this, &ATAPlayerState::SetQuestData);
+
+    QuestComponent->OnGetQuestProgress.BindLambda([this]() -> EQuestProgress { return CurrentQuestProgress; });
 }

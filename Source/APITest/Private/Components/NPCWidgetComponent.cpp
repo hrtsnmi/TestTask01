@@ -3,7 +3,7 @@
 
 #include "Components/NPCWidgetComponent.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 #include "UI/NPCInfoWidget.h"
 
 void UNPCWidgetComponent::BeginPlay()

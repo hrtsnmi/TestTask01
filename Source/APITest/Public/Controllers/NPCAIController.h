@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "../Data/FQuestData.h"
+#include "../Interfaces/InteractableInterface.h"
 #include "../Gamemode/DeclaringDelegatesForQuestFlow.h"
 
 #include "NPCAIController.generated.h"
@@ -17,25 +17,30 @@ class UTAQuestComponent;
 UCLASS()
 class APITEST_API ANPCAIController : public AAIController, public IInteractableInterface
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
 
 protected:
     virtual void OnPossess(APawn* InPawn) override;
 
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;
-    bool UnderInteract(FQuestData& OutData);
+    bool UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress);
 
 public:
     EInteractType GetInteractType_Implementation() const;
     void SetInteractType_Implementation(EInteractType InteractType);
 
-    void StartQuest_Implementation(AController* PlayerController);
-    void EndQuest_Implementation(AController* PlayerController);
+    bool CanStartQuest_Implementation();
+    bool CanEndQuest_Implementation();
 
- public: //Delegates For Gamemode
+    void PawnTryToStartNewQuest_Implementation(AController* OtherInteractPawn);
+    void PawnTryToEndQuest_Implementation(AController* OtherInteractPawn);
+
+     // Control Quest Progress
+    EQuestProgress UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver);
+    void PostProccessQuestProgress_Implementation(EQuestProgress QuestProgress);
+
+public:  // Delegates For Gamemode
     QuestFlowDelegates::OnQuestStartSignature OnQuestStart;
     QuestFlowDelegates::OnQuestEndSignature OnQuestEnd;
-
 };

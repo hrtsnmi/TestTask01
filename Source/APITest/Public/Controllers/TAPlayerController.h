@@ -6,32 +6,41 @@
 #include "GameFramework/PlayerController.h"
 #include "../Gamemode/DeclaringDelegatesForQuestFlow.h"
 #include "../Interfaces/InteractableInterface.h"
-
 #include "TAPlayerController.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class APITEST_API ATAPlayerController : public APlayerController, public IInteractableInterface
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 protected:
     virtual void OnPossess(APawn* InPawn) override;
 
+
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;
-    bool UnderInteract(FQuestData& OutData);
+    bool UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress);
 
 public:
     EInteractType GetInteractType_Implementation() const;
     void SetInteractType_Implementation(EInteractType InteractType);
 
-    void StartQuest_Implementation(AController* NPCController);
-    void EndQuest_Implementation(AController* NPCController);
+    bool CanStartQuest_Implementation();
+    bool CanEndQuest_Implementation();
+
+    void PawnTryToStartNewQuest_Implementation(AController* OtherInteractController);
+    void PawnTryToEndQuest_Implementation(AController* OtherInteractController);
+
+    // Control Quest Progress
+    EQuestProgress UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver);
+    void PostProccessQuestProgress_Implementation(EQuestProgress QuestProgress);
 
 public:  // Delegates For Gamemode
     QuestFlowDelegates::OnQuestStartSignature OnQuestStart;
     QuestFlowDelegates::OnQuestEndSignature OnQuestEnd;
+
 };

@@ -3,7 +3,7 @@
 
 #include "Components/SphereToShowWidgetComponent.h"
 #include "Interfaces/InteractableInterface.h"
-#include "Interfaces/HasInterfaceChecker.h"
+#include "Functions/Functions.h"
 
 void USphereToShowWidgetComponent::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
     UPrimitiveComponent* OtherComp,

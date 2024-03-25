@@ -20,16 +20,18 @@ class APITEST_API ATAPlayerState : public APlayerState
 
  private:
     FQuestData CurrentQuestData;
-    EQuestProgress CurrentQuestProggres;
+    EQuestProgress CurrentQuestProgress;
 
 protected:
     /** Overridable native event for when play begins for this actor. */
     virtual void BeginPlay() override;
 
 private:
-    void SetQuestData(const FQuestData& NewQuestData, AActor* QuestGiver);
+    void SetQuestData(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver);
     const FQuestData& GetQuestData() const;
+    //void PostProccessProgress(AActor* QuestGiver);
 
 public:
     void SetupDelegatesForQuestComponent(UTAQuestComponent* QuestComponent);
+
 };
