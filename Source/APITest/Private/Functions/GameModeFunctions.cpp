@@ -20,7 +20,21 @@ bool GameModeFunctions::CheckIfGameModeCanStartsQuest(
            (NPC == NPCController->GetPawn());
 }
 
-bool GameModeFunctions::CheckIfGameModeCanEndsQuest(AActor* Player, AActor* WhoCompletedQuest)
+bool GameModeFunctions::CheckIfGameModeCanEndsQuest(AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController)
 {
-    return Player == WhoCompletedQuest;
+    return (HasInterfaceChecker::HasInteractableInterface(PlayerController)
+                   ? IInteractableInterface::Execute_GetInteractType(PlayerController) == EInteractType::Master
+                   : false) &&
+           IInteractableInterface::Execute_CanEndQuest(PlayerController) &&
+           (HasInterfaceChecker::HasInteractableInterface(NPCController)
+                   ? IInteractableInterface::Execute_GetInteractType(NPCController) == EInteractType::Slave
+                   : false) &&
+           IInteractableInterface::Execute_CanEndQuest(NPCController) && (Player == PlayerController->GetPawn()) &&
+           (NPC == NPCController->GetPawn());
+}
+
+bool GameModeFunctions::CheckIfGameModeCanProcessQuest(APawn* Player, APawn* WhoCompletedQuest)
+{
+    return (Player == WhoCompletedQuest) && !IInteractableInterface::Execute_CanStartQuest(Player->GetController()) &&
+           !IInteractableInterface::Execute_CanEndQuest(Player->GetController());
 }

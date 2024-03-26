@@ -8,7 +8,20 @@
 
 void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
-    
+    static const FName QuestProgress = FName(TEXT("QuestProgress: "));
+    static const FName NoneProgress = FName(TEXT("None"));
+    static const FName GetProgress = FName(TEXT("Get"));
+    static const FName DoneProgress = FName(TEXT("Done"));
+
+    FString tmpString = QuestProgress.ToString();
+    switch (NewQuestProgress)
+    {
+        case EQuestProgress::NONE: tmpString += NoneProgress.ToString(); break;
+        case EQuestProgress::Get: tmpString += GetProgress.ToString(); break;
+        default: tmpString += DoneProgress.ToString(); break;
+    }
+    TB_QuestProgress->SetText(FText::FromString(tmpString));
+
     if (NewQuestData.Id == -1)
     {
         static const FName NoQuest = FName(TEXT("Quest is unavailable "));
@@ -20,6 +33,7 @@ void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgr
     }
     else
     {
+
         static const FName ID = FName(TEXT("ID: "));
         static const FName QuestDesc = FName(TEXT("Quest Desc: "));
         static const FName QuestType = FName(TEXT("Quest Type: "));
@@ -27,7 +41,7 @@ void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgr
         static const FName FindItem = FName(TEXT("FindItem"));
         static const FName MoveTo = FName(TEXT("MoveTo"));
 
-        FString tmpString = ID.ToString() + FString::FromInt(NewQuestData.Id);
+        tmpString = ID.ToString() + FString::FromInt(NewQuestData.Id);
         TB_ID->SetText(FText::FromString(tmpString));
 
         tmpString = QuestDesc.ToString() + NewQuestData.QuestDesc;

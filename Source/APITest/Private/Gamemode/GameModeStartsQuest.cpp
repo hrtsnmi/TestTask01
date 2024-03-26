@@ -3,83 +3,83 @@
 #include "Data/FQuestData.h"
 #include "QuestSystem/SpamActor.h"
 
-
 void ATABaseGameMode::GameModeStartsQuest(APawn* Player, APawn* NPC)
 {
     // can start quest with data in NPC
-    FQuestData QuestToStart;
+    FQuestData QuestToStart, placeholder;
     EQuestProgress NewNPCProgress, NewPlayerProgress;
 
-    IInteractableInterface::Execute_UnderInteract(Player->GetController(), QuestToStart, NewPlayerProgress);
+    GetCurrentQuestDataFor(Player, NPC, placeholder, QuestToStart, NewPlayerProgress, NewNPCProgress);
 
-    bool canGetQuest = IInteractableInterface::Execute_UnderInteract(NPC->GetController(), QuestToStart, NewNPCProgress);
-    if (!canGetQuest)
+    // Set For player data from NPC, and NPC with empty data
+    SetNewQuestDataFor(Player, NPC, QuestToStart, FQuestData(), NewPlayerProgress, NewNPCProgress, false);
+
+    const TSubclassOf<ASpamActor>& tmp = QuestToStart.QuestType == EQuestType::FindItem ? FindItemSubClass : MoveToSubClass;
+
+    if (tmp)
     {
-        return;
-    }
-    // Get New Progres Type
-    NewPlayerProgress =
-        IInteractableInterface::Execute_UpdateQuestProgress(Player->GetController(), NewPlayerProgress, NPC->GetController());
-    NewNPCProgress = IInteractableInterface::Execute_UpdateQuestProgress(NPC->GetController(), NewNPCProgress, Player->GetController());
-
-    // Set Data to player
-    SetNewQuestData(Player->GetController(), QuestToStart, NewPlayerProgress, NPC);
-
-    // Set Empty Data for NPC
-    SetNewQuestData(NPC->GetController(), FQuestData(), NewNPCProgress, Player);
-
-    // Start Mission with QuestToStart data
-    /* IInteractableInterface::Execute_PostProccessQuestProgress(Player->GetController(), NewPlayerProgress);
-     IInteractableInterface::Execute_PostProccessQuestProgress(NPC->GetController(), NewNPCProgress);*/
-    
-    ASpamActor* SpamActor;
-    switch (QuestToStart.QuestType)
-    {
-       
-        case EQuestType::FindItem:
-            // FindItem Quest creation
-            // Spam Item actor
-            if (!FindItemSubClass)
+        ASpamActor*  SpamActor = GetWorld()->SpawnActor<ASpamActor>(tmp, QuestToStart.TargetLocation, FRotator());
+        SpamActor->OnEndQuestConditionsReaching.BindLambda(
+            [this](APawn* Player)
             {
-                return;
-            }
-            SpamActor = GetWorld()->SpawnActor<ASpamActor>(FindItemSubClass, QuestToStart.TargetLocation, FRotator());
-
-            break;
-        default:
-            // Move to Quest creation
-            // spam Item actor which is not visible
-            if (!MoveToSubClass)
-            {
-                return;
-            }
-            SpamActor = GetWorld()->SpawnActor<ASpamActor>(MoveToSubClass, QuestToStart.TargetLocation, FRotator());
-            break;
+                // WhoCompletedQuest = Player;
+                UpdateQuestFlow(Player->GetController(), nullptr, EQuestProgress::Get);
+            });
     }
+}
 
-    SpamActor->OnEndQuestConditionsReaching.BindLambda(
-        [this](APawn* Player)
-        {
-            WhoCompletedQuest = Player;
-            UpdateQuestFlow(nullptr, nullptr, false);
-        });
+void ATABaseGameMode::GameModeProgressQuest(APawn* Player, APawn* NPC)
+{
+    FQuestData CurrentPlayerData, CurrentNPCData;
+    EQuestProgress CurrentNPCProgress, CurrentPlayerProgress;
+
+    GetCurrentQuestDataFor(Player, NPC, CurrentPlayerData, CurrentNPCData, CurrentPlayerProgress, CurrentNPCProgress);
+
+    SetNewQuestDataFor(Player, NPC, CurrentPlayerData, CurrentNPCData, CurrentPlayerProgress, CurrentNPCProgress, true);
 }
 
 void ATABaseGameMode::GameModeEndsQuest(APawn* Player, APawn* NPC)
 {
     // Get New Progres Type
-    FQuestData QuestToStart;
+    FQuestData Placeholder1, Placeholder2;
     EQuestProgress NewNPCProgress, NewPlayerProgress;
 
-    IInteractableInterface::Execute_UnderInteract(Player->GetController(), QuestToStart, NewPlayerProgress);
-    IInteractableInterface::Execute_UnderInteract(NPC->GetController(), QuestToStart, NewNPCProgress);
+    GetCurrentQuestDataFor(Player, NPC, Placeholder1, Placeholder2, NewPlayerProgress, NewNPCProgress);
 
-    NewPlayerProgress = IInteractableInterface::Execute_UpdateQuestProgress(Player->GetController(), NewPlayerProgress, NPC->GetController());
-    NewNPCProgress = IInteractableInterface::Execute_UpdateQuestProgress(NPC->GetController(), NewNPCProgress, Player->GetController());
+    SetNewQuestDataFor(Player, NPC, FQuestData(), GetAvailableQuest(), NewPlayerProgress, NewNPCProgress, false);
+}
+
+
+void ATABaseGameMode::GetCurrentQuestDataFor(APawn* Player, APawn* NPC, FQuestData& CurrentPlayerData, FQuestData& CurrentNPCData,
+    EQuestProgress& NewPlayerProgress, EQuestProgress& NewNPCProgress)
+{
+    IInteractableInterface::Execute_UnderInteract(Player->GetController(), CurrentPlayerData, NewPlayerProgress);
+    IInteractableInterface::Execute_UnderInteract(NPC->GetController(), CurrentNPCData, NewNPCProgress);
+}
+
+void ATABaseGameMode::SetNewQuestDataFor(APawn* Player, APawn* NPC, const FQuestData& NewPlayerData, const FQuestData& NewNPCData,
+    EQuestProgress NewPlayerProgress, EQuestProgress NewNPCProgress, bool bIsGameModeSender)
+{
+    AActor* QuestSenderForPlayer = nullptr;
+    AActor* QuestSenderForNPC = nullptr;
+
+    if (bIsGameModeSender)
+    {
+        QuestSenderForNPC = QuestSenderForPlayer = this;
+    }
+    else
+    {
+        QuestSenderForPlayer = NPC->GetController();
+        QuestSenderForNPC = Player->GetController();
+    }
+
+    NewPlayerProgress =
+        IInteractableInterface::Execute_UpdateQuestProgress(Player->GetController(), NewPlayerProgress, QuestSenderForPlayer);
+    NewNPCProgress = IInteractableInterface::Execute_UpdateQuestProgress(NPC->GetController(), NewNPCProgress, QuestSenderForNPC);
 
     // Set Data to player
-    SetNewQuestData(Player->GetController(), FQuestData(), NewPlayerProgress, this);
+    SetNewQuestData(Player->GetController(), NewPlayerData, NewPlayerProgress, QuestSenderForPlayer);
 
-    // Set Empty Data for NPC
-    SetNewQuestData(NPC->GetController(), GetAvailableQuest(), NewNPCProgress, this);
+    // Set Data for NPC
+    SetNewQuestData(NPC->GetController(), NewNPCData, NewNPCProgress, QuestSenderForNPC);
 }

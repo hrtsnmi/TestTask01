@@ -21,6 +21,9 @@ class APITEST_API UNPCInfoWidget : public UUserWidget
 
 private:
     UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "UI|ID")
+    UTextBlock* TB_QuestProgress;
+
+    UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "UI|ID")
     UTextBlock* TB_ID;
 
     UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "UI|Quest Desc")

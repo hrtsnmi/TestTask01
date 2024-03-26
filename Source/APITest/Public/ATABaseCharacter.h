@@ -37,7 +37,7 @@ private:
     void Interact(const FInputActionValue& Value);
 
 private:
-    bool TryToSendRequestToStartQuest(AController* NPCController);
+    bool TryToSendRequestToStartEndQuest(AController* NPCController);
 
 public:
 	ATABaseCharacter();

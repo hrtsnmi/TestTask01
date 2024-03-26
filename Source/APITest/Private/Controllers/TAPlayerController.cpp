@@ -30,12 +30,12 @@ void ATAPlayerController::SetInteractType_Implementation(EInteractType InteractT
 
 bool ATAPlayerController::CanStartQuest_Implementation()
 {
-    return ControllersFunctions::CanPawnStartQuest(GetPawn(), CurrentInteractType);
+    return ControllersFunctions::CanPawnDoQuest(GetPawn(), CurrentInteractType);
 }
 
 bool ATAPlayerController::CanEndQuest_Implementation()
 {
-    return false;
+    return ControllersFunctions::CanPawnDoQuest(GetPawn(), CurrentInteractType, false);
 }
 
 void ATAPlayerController::PawnTryToStartNewQuest_Implementation(AController* OtherInteractController)
@@ -43,9 +43,11 @@ void ATAPlayerController::PawnTryToStartNewQuest_Implementation(AController* Oth
     ControllersFunctions::PawnTryToStartNewQuest(this, OtherInteractController, OnQuestStart);
 }
 
-void ATAPlayerController::PawnTryToEndQuest_Implementation(AController* OtherInteractController) {}
+void ATAPlayerController::PawnTryToEndQuest_Implementation(AController* OtherInteractController)
+{
+    ControllersFunctions::PawnTryToStartNewQuest(this, OtherInteractController, OnQuestEnd);
+}
 
-   
 
 EQuestProgress ATAPlayerController::UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver)
 {

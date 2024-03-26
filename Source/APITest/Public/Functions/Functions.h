@@ -25,10 +25,13 @@ void OnPossess(APawn* InPawn);
 
 bool UnderInteract(AController* Controller, FQuestData& OutData, EQuestProgress& OutProgress);
 
-bool CanPawnStartQuest(APawn* Pawn, EInteractType InteractType);
+bool CanPawnDoQuest(APawn* Pawn, EInteractType InteractType, bool isStarting = true);
 
 void PawnTryToStartNewQuest(
     AController* PlayerController, AController* NPCController, QuestFlowDelegates::OnQuestStartSignature& OnQuestStart);
+
+void PawnTryToEndQuest(
+    AController* PlayerController, AController* NPCController, QuestFlowDelegates::OnQuestEndSignature& OnQuestEnd);
 
 // Control Quest Progress
 EQuestProgress UpdateQuestProgress(AController* FuncCaller, EQuestProgress CurrentProgress, AActor* QuestGiver);
@@ -42,7 +45,8 @@ namespace GameModeFunctions
 {
 
 bool CheckIfGameModeCanStartsQuest(AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController);
-bool CheckIfGameModeCanEndsQuest(AActor* Player, AActor* WhoCompletedQuest);
+bool CheckIfGameModeCanEndsQuest(AActor* Player, AActor* NPC, AController* PlayerController, AController* NPCController);
+bool CheckIfGameModeCanProcessQuest(APawn* Player, APawn* WhoCompletedQuest);
 
 }
 

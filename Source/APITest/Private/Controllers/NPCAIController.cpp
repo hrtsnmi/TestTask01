@@ -29,12 +29,12 @@ void ANPCAIController::SetInteractType_Implementation(EInteractType InteractType
 
 bool ANPCAIController::CanStartQuest_Implementation()
 {
-    return ControllersFunctions::CanPawnStartQuest(GetPawn(), CurrentInteractType);
+    return ControllersFunctions::CanPawnDoQuest(GetPawn(), CurrentInteractType);
 }
 
 bool ANPCAIController::CanEndQuest_Implementation()
 {
-    return false;
+    return ControllersFunctions::CanPawnDoQuest(GetPawn(), CurrentInteractType, false);
 }
 
 void ANPCAIController::PawnTryToStartNewQuest_Implementation(AController* OtherInteractController)
@@ -42,7 +42,10 @@ void ANPCAIController::PawnTryToStartNewQuest_Implementation(AController* OtherI
     OnQuestStart.ExecuteIfBound(OtherInteractController, this);
 }
 
-void ANPCAIController::PawnTryToEndQuest_Implementation(AController* OtherInteractPawn) {}
+void ANPCAIController::PawnTryToEndQuest_Implementation(AController* OtherInteractController)
+{
+    ControllersFunctions::PawnTryToEndQuest(OtherInteractController, this, OnQuestEnd);
+}
 
 EQuestProgress ANPCAIController::UpdateQuestProgress_Implementation(EQuestProgress CurrentProgress, AActor* QuestGiver)
 {

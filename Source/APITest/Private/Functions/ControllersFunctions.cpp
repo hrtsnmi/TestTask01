@@ -31,13 +31,13 @@ bool ControllersFunctions::UnderInteract(AController* Controller, FQuestData& Ou
                : false;
 }
 
-bool ControllersFunctions::CanPawnStartQuest(APawn* Pawn, EInteractType InteractType)
+bool ControllersFunctions::CanPawnDoQuest(APawn* Pawn, EInteractType InteractType, bool isStarting)
 {
     EQuestProgress ProgressToCompare;
     switch (InteractType)
     {
-        case EInteractType::Master: ProgressToCompare = EQuestProgress::NONE; break;
-        default: ProgressToCompare = EQuestProgress::Get; break;
+        case EInteractType::Master: ProgressToCompare = isStarting ? EQuestProgress::NONE : EQuestProgress::Done; break;
+        default: ProgressToCompare = isStarting ? EQuestProgress::Get : EQuestProgress::Done; break;
     }
 
     if (!HasInterfaceChecker::HasQuestComponentOwnerInterface(Pawn))
@@ -55,6 +55,12 @@ void ControllersFunctions::PawnTryToStartNewQuest(
     AController* PlayerController, AController* NPCController, QuestFlowDelegates::OnQuestStartSignature& OnQuestStart)
 {
     OnQuestStart.ExecuteIfBound(PlayerController, NPCController);
+}
+
+void ControllersFunctions::PawnTryToEndQuest(
+    AController* PlayerController, AController* NPCController, QuestFlowDelegates::OnQuestEndSignature& OnQuestEnd)
+{
+    OnQuestEnd.ExecuteIfBound(PlayerController, NPCController);
 }
 
 EQuestProgress ControllersFunctions::UpdateQuestProgress(AController* FuncCaller, EQuestProgress CurrentProgress, AActor* QuestGiver)
@@ -80,11 +86,17 @@ EQuestProgress ControllersFunctions::UpdateQuestProgress(AController* FuncCaller
 
     if (forCompare)
     {
-        return EQuestProgress(((uint8)CurrentProgress + 1U) % (uint8)EQuestProgress::Max);
+        uint8 Result = ((uint8)CurrentProgress + 1U) % (uint8)EQuestProgress::Max;
+        if (!ControllerHasMasterInteract && !Result)
+        {
+            Result++;
+        }
+
+        return (EQuestProgress)Result;
     }
     else
     {
-        return ControllerHasMasterInteract ? EQuestProgress::NONE : EQuestProgress::Get;
+        return ControllerHasMasterInteract ? EQuestProgress::Done : CurrentProgress;
     }
 }
 

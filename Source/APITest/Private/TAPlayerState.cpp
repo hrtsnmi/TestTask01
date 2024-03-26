@@ -15,6 +15,15 @@ void ATAPlayerState::BeginPlay()
 void ATAPlayerState::SetQuestData(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
     CurrentQuestData = NewQuestData;
+    if (CurrentQuestProgress == EQuestProgress::Done && NewQuestProgress == EQuestProgress::NONE)
+    {
+        SetScore(GetScore() + 1);
+
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(3, 5.f, FColor::Orange, FString::Printf(TEXT("Number of completed quests: %f"), GetScore()));
+        }
+    }
     CurrentQuestProgress = NewQuestProgress;
 }
 

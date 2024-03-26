@@ -80,38 +80,48 @@ void ATABaseGameMode::SetNewQuestData(
     IQuestComponentOwnerInterface::Execute_SetDataInComponent(QuestController->GetPawn(), NewQuestData, NewQuestProgress, QuestTaker);
 }
 
-void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController* NPCController, bool bIsStart)
+void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController* NPCController, EQuestProgress GlobalProgress)
 {
     // Set Actors which interacts to start Quest
-    static bool PlayerWantsToStartQuest{false};
+    static bool PlayerWantsToStartQuest{true};
     static APawn* NPC{nullptr};
     static APawn* Player{nullptr};
+    // static APawn* WhoCompletedQuest{nullptr};
 
-    if (PlayerWantsToStartQuest)  // Called by NPC - second time
+    if (GlobalProgress == EQuestProgress::Get && GameModeFunctions::CheckIfGameModeCanProcessQuest(Player, PlayerController->GetPawn()))
     {
-        if (GameModeFunctions::CheckIfGameModeCanStartsQuest(Player, NPC, PlayerController, NPCController))
+        GameModeProgressQuest(Player, NPC);
+        return;
+    }
+
+
+    if (PlayerWantsToStartQuest)  // Called by Player - first time
+    {
+        if (!Player)
+        {
+            Player = PlayerController ? PlayerController->GetPawn() : nullptr;
+        }
+        if (!NPC)
+        {
+            NPC = NPCController ? NPCController->GetPawn() : nullptr;
+        }
+    }
+    else  // Called by NPC - second time
+    {
+        if (GlobalProgress == EQuestProgress::NONE &&  // - Start Quest
+            GameModeFunctions::CheckIfGameModeCanStartsQuest(Player, NPC, PlayerController, NPCController))
         {
             GameModeStartsQuest(Player, NPC);
         }
-    }
-    else if (bIsStart)  // Called by Player - first time
-    {
-        Player = PlayerController->GetPawn();
-        NPC = NPCController->GetPawn();
-    }
-    else
-    {
-        // TODO: Check If Player Finish Quest
-        if (GameModeFunctions::CheckIfGameModeCanEndsQuest(Player, WhoCompletedQuest))
+        else if (GlobalProgress == EQuestProgress::Done &&
+                 GameModeFunctions::CheckIfGameModeCanEndsQuest(Player, NPC, PlayerController, NPCController))
         {
             GameModeEndsQuest(Player, NPC);
+
+            Player = nullptr;
+            NPC = nullptr;
+            // WhoCompletedQuest = nullptr;
         }
-
-        Player = nullptr;
-        NPC = nullptr;
-        WhoCompletedQuest = nullptr;
-
-        return;
     }
 
     PlayerWantsToStartQuest = !PlayerWantsToStartQuest;
@@ -124,5 +134,5 @@ void ATABaseGameMode::UpdateStartQuestProgress(AController* PlayerController, AC
 
 void ATABaseGameMode::UpdateEndQuestProgress(AController* PlayerController, AController* NPCController)
 {
-    UpdateQuestFlow(PlayerController, NPCController, false);
+    UpdateQuestFlow(PlayerController, NPCController, EQuestProgress::Done);
 }

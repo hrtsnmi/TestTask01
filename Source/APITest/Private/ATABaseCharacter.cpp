@@ -29,6 +29,11 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
         return;
     }
 
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
+    }
+
     TArray<AActor*> QuestOwnerActors;
     GetOverlappingActors(QuestOwnerActors, UQuestComponentOwnerInterface::StaticClass());
 
@@ -48,7 +53,7 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
                 continue;
             }
 
-            if (TryToSendRequestToStartQuest(QuestOwnerPawn->GetController()))
+            if (TryToSendRequestToStartEndQuest(QuestOwnerPawn->GetController()))
             {
                 break;
             }
@@ -59,20 +64,34 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
         }
     }
 }
-
-bool ATABaseCharacter::TryToSendRequestToStartQuest(AController* NPCController)
+bool ATABaseCharacter::TryToSendRequestToStartEndQuest(AController* NPCController)
 {
     bool ControllersHasInteractableInterface =
         HasInterfaceChecker::HasInteractableInterface(GetController()) && HasInterfaceChecker::HasInteractableInterface(NPCController);
 
-    if (ControllersHasInteractableInterface)
+    if (!ControllersHasInteractableInterface)
+    {
+        return ControllersHasInteractableInterface;
+    }
+
+    if (IInteractableInterface::Execute_CanEndQuest(NPCController))
+    {
+        IInteractableInterface::Execute_PawnTryToEndQuest(GetController(), NPCController);
+        IInteractableInterface::Execute_PawnTryToEndQuest(NPCController, GetController());
+        return ControllersHasInteractableInterface;
+    }
+
+    if (IInteractableInterface::Execute_CanStartQuest(NPCController))
     {
         IInteractableInterface::Execute_PawnTryToStartNewQuest(GetController(), NPCController);
         IInteractableInterface::Execute_PawnTryToStartNewQuest(NPCController, GetController());
+        return ControllersHasInteractableInterface;
     }
 
     return ControllersHasInteractableInterface;
 }
+
+
 
 void ATABaseCharacter::Tick(float DeltaTime)
 {
