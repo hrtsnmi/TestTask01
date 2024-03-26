@@ -8,7 +8,7 @@
 
 class USphereToShowWidgetComponent;
 
-DECLARE_DELEGATE_OneParam(OnEndQuestConditionsReachingSignature, AActor*);
+DECLARE_DELEGATE_OneParam(OnEndQuestConditionsReachingSignature, APawn*);
 
 UCLASS()
 class APITEST_API ASpamActor : public AActor

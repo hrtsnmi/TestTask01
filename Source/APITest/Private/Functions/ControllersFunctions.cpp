@@ -73,19 +73,18 @@ EQuestProgress ControllersFunctions::UpdateQuestProgress(AController* FuncCaller
                    : false;
     };
 
+    bool ControllerHasMasterInteract = IInteractableInterface::Execute_GetInteractType(FuncCaller) == EInteractType::Master;
 
     static bool forCompare;
-    forCompare = HasQuestGiverAnInteractType((IInteractableInterface::Execute_GetInteractType(FuncCaller) == EInteractType::Master)
-                                                 ? EInteractType::Slave
-                                                 : EInteractType::Master,
-        QuestGiver);
+    forCompare = HasQuestGiverAnInteractType(ControllerHasMasterInteract ? EInteractType::Slave : EInteractType::Master, QuestGiver);
+
     if (forCompare)
     {
         return EQuestProgress(((uint8)CurrentProgress + 1U) % (uint8)EQuestProgress::Max);
     }
     else
     {
-        return CurrentProgress;
+        return ControllerHasMasterInteract ? EQuestProgress::NONE : EQuestProgress::Get;
     }
 }
 

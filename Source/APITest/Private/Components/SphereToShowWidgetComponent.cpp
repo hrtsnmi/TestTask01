@@ -51,23 +51,23 @@ void USphereToShowWidgetComponent::WatchActorInRangeToShowWidget(AController* Ot
         return;
     }
 
-    bool Visability = false;
+    bool Visibility = false;
     if (bIsWidgetVisible)
     {
-        Visability = WatchedActor != OtherActor->GetPawn();
+        Visibility = WatchedActor.Get() != OtherActor->GetPawn();
 
-        WatchedActor = nullptr;
+       WatchedActor.Reset();
     }
     else
     {
-        Visability = IInteractableInterface::Execute_GetInteractType(OtherActor) == EInteractType::Master;
-        if (Visability)
+        Visibility = IInteractableInterface::Execute_GetInteractType(OtherActor) == EInteractType::Master;
+        if (Visibility)
         {
             WatchedActor = OtherActor->GetPawn();
         }
     }
 
-    OnSetWidgetVisibility.ExecuteIfBound(Visability);
+    OnSetWidgetVisibility.ExecuteIfBound(Visibility);
 }
 
 void USphereToShowWidgetComponent::BeginPlay()

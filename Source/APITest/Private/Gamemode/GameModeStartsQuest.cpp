@@ -58,7 +58,7 @@ void ATABaseGameMode::GameModeStartsQuest(APawn* Player, APawn* NPC)
     }
 
     SpamActor->OnEndQuestConditionsReaching.BindLambda(
-        [this](AActor* Player)
+        [this](APawn* Player)
         {
             WhoCompletedQuest = Player;
             UpdateQuestFlow(nullptr, nullptr, false);
@@ -71,9 +71,11 @@ void ATABaseGameMode::GameModeEndsQuest(APawn* Player, APawn* NPC)
     FQuestData QuestToStart;
     EQuestProgress NewNPCProgress, NewPlayerProgress;
 
-    NewPlayerProgress =
-        IInteractableInterface::Execute_UpdateQuestProgress(Player->GetController(), NewPlayerProgress, this);
-    NewNPCProgress = IInteractableInterface::Execute_UpdateQuestProgress(NPC->GetController(), NewNPCProgress, this);
+    IInteractableInterface::Execute_UnderInteract(Player->GetController(), QuestToStart, NewPlayerProgress);
+    IInteractableInterface::Execute_UnderInteract(NPC->GetController(), QuestToStart, NewNPCProgress);
+
+    NewPlayerProgress = IInteractableInterface::Execute_UpdateQuestProgress(Player->GetController(), NewPlayerProgress, NPC->GetController());
+    NewNPCProgress = IInteractableInterface::Execute_UpdateQuestProgress(NPC->GetController(), NewNPCProgress, Player->GetController());
 
     // Set Data to player
     SetNewQuestData(Player->GetController(), FQuestData(), NewPlayerProgress, this);

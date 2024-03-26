@@ -17,7 +17,10 @@ class APITEST_API USphereToShowWidgetComponent : public USphereComponent
 	GENERATED_BODY()
 	
 private:
-    AActor* WatchedActor{nullptr};
+    //APawn* WatchedActor{nullptr};
+
+    UPROPERTY()
+    TWeakObjectPtr<APawn> WatchedActor;
  
 private:
     UFUNCTION()
@@ -37,5 +40,5 @@ public:
     OnGotWidgetVisibilitySignature OnGotWidgetVisibility;
     OnSetWidgetVisibilitySignature OnSetWidgetVisibility;
 
-    AActor* GetWatchedActor() const { return WatchedActor; }
+    APawn* GetWatchedActor() const { return WatchedActor.IsValid() ? WatchedActor.Get() : nullptr; }
 };

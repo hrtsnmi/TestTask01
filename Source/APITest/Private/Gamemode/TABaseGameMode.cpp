@@ -94,27 +94,24 @@ void ATABaseGameMode::UpdateQuestFlow(AController* PlayerController, AController
             GameModeStartsQuest(Player, NPC);
         }
     }
-    else  // Called by Player - first time
+    else if (bIsStart)  // Called by Player - first time
     {
-        if (bIsStart)
+        Player = PlayerController->GetPawn();
+        NPC = NPCController->GetPawn();
+    }
+    else
+    {
+        // TODO: Check If Player Finish Quest
+        if (GameModeFunctions::CheckIfGameModeCanEndsQuest(Player, WhoCompletedQuest))
         {
-            Player = PlayerController->GetPawn();
-            NPC = NPCController->GetPawn();
+            GameModeEndsQuest(Player, NPC);
         }
-        else
-        {
-            //TODO: Check If Player Finish Quest
-            if (GameModeFunctions::CheckIfGameModeCanEndsQuest(Player, WhoCompletedQuest))
-            {
-                GameModeEndsQuest(Player, NPC);
-            }
 
-            Player = nullptr;
-            NPC = nullptr;
-            WhoCompletedQuest = nullptr;
+        Player = nullptr;
+        NPC = nullptr;
+        WhoCompletedQuest = nullptr;
 
-            return;
-        }
+        return;
     }
 
     PlayerWantsToStartQuest = !PlayerWantsToStartQuest;
