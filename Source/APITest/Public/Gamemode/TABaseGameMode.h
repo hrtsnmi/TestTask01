@@ -20,7 +20,13 @@ UCLASS()
 class APITEST_API ATABaseGameMode : public AGameMode
 {
     GENERATED_BODY()
+ 
+private:     
+    TUniquePtr<ASpamActor> SpawnedActor;
 
+    void SpawnItem(const TSubclassOf<ASpamActor>& tmp, const FVector SpawnLocation);
+    void DestroyItem(TUniquePtr<ASpamActor>& ToDestroy);
+     
 private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpamActors|For Move To Quest", meta = (AllowPrivateAccess = "true"))
     TSubclassOf<ASpamActor> MoveToSubClass;
@@ -55,6 +61,8 @@ protected:
     virtual void PostLogin(APlayerController* NewPlayer) override;
 
     virtual void BeginPlay() override;
+
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
     void SetInteractType(AController* InController, bool bIsMasterInteract);
 

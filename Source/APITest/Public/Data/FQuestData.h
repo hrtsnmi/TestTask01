@@ -44,5 +44,5 @@ public:
     EQuestType QuestType = EQuestType::MoveTo;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FVector TargetLocation;
+    FVector TargetLocation = FVector::ZeroVector;
 };

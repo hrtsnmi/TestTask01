@@ -21,11 +21,11 @@ UTAQuestManager::UTAQuestManager()
     AddToRoot();
 }
 
-//UTAQuestManager::~UTAQuestManager()
-//{
-//    QuestDataArray.Empty();
-//    SingletonInstance->RemoveFromRoot();
-//}
+UTAQuestManager::~UTAQuestManager()
+{
+    QuestDataArray.Empty();
+    RemoveFromRoot();
+}
 
 UTAQuestManager* UTAQuestManager::GetInstance()
 {

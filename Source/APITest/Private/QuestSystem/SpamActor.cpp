@@ -32,10 +32,9 @@ void ASpamActor::BeginPlay()
             if (Visibility)
             {
                 OnEndQuestConditionsReaching.ExecuteIfBound(SphereComp->GetWatchedActor());
-                Destroy();
+                //Destroy();
             }
         });
-
 }
 
 // Called every frame
@@ -43,5 +42,12 @@ void ASpamActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ASpamActor::BeginDestroy()
+{
+    Super::BeginDestroy();
+
+    OnEndQuestConditionsReaching.Unbind();
 }
 

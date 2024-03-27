@@ -34,5 +34,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void BeginDestroy() override;
+
 	OnEndQuestConditionsReachingSignature OnEndQuestConditionsReaching;
 };

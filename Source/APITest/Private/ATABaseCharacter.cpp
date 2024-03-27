@@ -18,87 +18,15 @@ void ATABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ATABaseCharacter::Interact(const FInputActionValue& Value)
-{
-    bool bIsInteractStartes = Value.Get<bool>();
-
-    if (!bIsInteractStartes)
+     if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
     {
-        return;
-    }
+        UEnhancedInputLocalPlayerSubsystem* Subsystem =
+            ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(2, 0.5f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
-    }
-
-    TArray<AActor*> QuestOwnerActors;
-    GetOverlappingActors(QuestOwnerActors, UQuestComponentOwnerInterface::StaticClass());
-
-    for (AActor* QuestOwnerActor : QuestOwnerActors)
-    {
-        if (APawn* QuestOwnerPawn = Cast<APawn>(QuestOwnerActor))
-        {
-            if (QuestOwnerActor == this)
-            {
-                continue;
-            }
-
-            FVector DistanceToActorNorm = QuestOwnerActor->GetActorLocation() - GetActorLocation();
-            DistanceToActorNorm.Normalize();
-            if (FVector::DotProduct(GetActorForwardVector(), DistanceToActorNorm) < 0.6f)
-            {
-                continue;
-            }
-
-            if (TryToSendRequestToStartEndQuest(QuestOwnerPawn->GetController()))
-            {
-                if (GEngine)
-                {
-                    GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Blue,
-                        FString::Printf(
-                            TEXT("Interact %s and %s"), *GetController()->GetName(), *QuestOwnerPawn->GetController()->GetName()));
-                }
-
-                break;
-            }
-            else
-            {
-                continue;
-            }
-        }
+        // Subsystem->ClearAllMappings();
+        Subsystem->AddMappingContext(DefaultMappingContext, 1);
     }
 }
-bool ATABaseCharacter::TryToSendRequestToStartEndQuest(AController* NPCController)
-{
-    bool ControllersHasInteractableInterface =
-        HasInterfaceChecker::HasInteractableInterface(GetController()) && HasInterfaceChecker::HasInteractableInterface(NPCController);
-
-    if (!ControllersHasInteractableInterface)
-    {
-        return ControllersHasInteractableInterface;
-    }
-
-    if (IInteractableInterface::Execute_CanEndQuest(NPCController))
-    {
-        IInteractableInterface::Execute_PawnTryToEndQuest(GetController(), NPCController);
-        IInteractableInterface::Execute_PawnTryToEndQuest(NPCController, GetController());
-        return ControllersHasInteractableInterface;
-    }
-
-    if (IInteractableInterface::Execute_CanStartQuest(NPCController))
-    {
-        IInteractableInterface::Execute_PawnTryToStartNewQuest(GetController(), NPCController);
-        IInteractableInterface::Execute_PawnTryToStartNewQuest(NPCController, GetController());
-        return ControllersHasInteractableInterface;
-    }
-
-    return ControllersHasInteractableInterface;
-}
-
-
 
 void ATABaseCharacter::Tick(float DeltaTime)
 {
@@ -106,26 +34,18 @@ void ATABaseCharacter::Tick(float DeltaTime)
 
     if (GEngine)
     {
-        GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
+        GEngine->AddOnScreenDebugMessage(
+            6, 0.5f, FColor::Blue, FString::Printf(TEXT("%s location: %s"), *GetName(), *GetActorLocation().ToString()));
     }
 }
 
 void ATABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-    if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
-    {
-        UEnhancedInputLocalPlayerSubsystem* Subsystem =
-            ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-
-        Subsystem->ClearAllMappings();
-        Subsystem->AddMappingContext(DefaultMappingContext, 0);
-    }
-
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
     {
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Move);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATABaseCharacter::Look);
-        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ATABaseCharacter::Interact);
+        //EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ATABaseCharacter::Interact);
     }
 }
 
@@ -156,10 +76,13 @@ void ATABaseCharacter::Look(const FInputActionValue& Value)
 {
     FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-    if (Controller != nullptr)
+    if (!Controller)
     {
-        // add yaw and pitch input to controller
-        AddControllerYawInput(LookAxisVector.X);
-        AddControllerPitchInput(-LookAxisVector.Y);
+        return;
     }
+
+    // add yaw and pitch input to controller
+    AddControllerYawInput(LookAxisVector.X);
+    AddControllerPitchInput(-LookAxisVector.Y);
 }
+

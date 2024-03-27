@@ -27,17 +27,9 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     class UInputAction* LookAction;
 
-    /** Interact Input Action */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputAction* InteractAction;
-
 private:
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
-    void Interact(const FInputActionValue& Value);
-
-private:
-    bool TryToSendRequestToStartEndQuest(AController* NPCController);
 
 public:
 	ATABaseCharacter();

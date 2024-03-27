@@ -39,6 +39,9 @@ void PawnTryToEndQuest(
 EQuestProgress UpdateQuestProgress(AController* FuncCaller, EQuestProgress CurrentProgress, AActor* QuestGiver);
 void PostProccessQuestProgress(AController* FuncCaller, EQuestProgress QuestProgress);
 
+// controller Input
+bool TryToSendRequestToStartEndQuest(AController* PlayerController, AController* NPCController);
+
 }  // namespace ControllerFunctions
 
 class ATABaseGameMode;

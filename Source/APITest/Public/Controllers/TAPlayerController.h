@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "../Gamemode/DeclaringDelegatesForQuestFlow.h"
 #include "../Interfaces/InteractableInterface.h"
+#include "InputActionValue.h"
+
 #include "TAPlayerController.generated.h"
 
 /**
@@ -17,6 +19,19 @@ class APITEST_API ATAPlayerController : public APlayerController, public IIntera
 {
     GENERATED_BODY()
 
+        private:
+    /** MappingContext */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    class UInputMappingContext* DefaultMappingContext;
+
+    /** Interact Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    class UInputAction* InteractAction;
+
+    /** Interact Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    class UInputAction* ExitAction;
+
 protected:
     //virtual void OnPossess(APawn* InPawn) override;
     virtual void BeginPlay() override;
@@ -24,6 +39,11 @@ protected:
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;
     bool UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress);
+
+    virtual void SetupInputComponent() override;
+
+    void Interact(const FInputActionValue& Value);
+    void ExitButtonPressed(const FInputActionValue& Value);
 
 public:
     EInteractType GetInteractType_Implementation() const;

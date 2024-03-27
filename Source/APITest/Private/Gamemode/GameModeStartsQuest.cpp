@@ -16,16 +16,44 @@ void ATABaseGameMode::GameModeStartsQuest(APawn* Player, APawn* NPC)
 
     const TSubclassOf<ASpamActor>& tmp = QuestToStart.QuestType == EQuestType::FindItem ? FindItemSubClass : MoveToSubClass;
 
-    if (tmp)
+    SpawnItem(tmp, QuestToStart.TargetLocation);
+}
+
+void ATABaseGameMode::SpawnItem(const TSubclassOf<ASpamActor>& tmp, const FVector SpawnLocation)
+{
+    if (!tmp)
     {
-        ASpamActor*  SpamActor = GetWorld()->SpawnActor<ASpamActor>(tmp, QuestToStart.TargetLocation, FRotator());
-        SpamActor->OnEndQuestConditionsReaching.BindLambda(
-            [this](APawn* Player)
-            {
-                // WhoCompletedQuest = Player;
-                UpdateQuestFlow(Player->GetController(), nullptr, EQuestProgress::Get);
-            });
+        return;
     }
+
+    SpawnedActor.Reset(GetWorld()->SpawnActor<ASpamActor>(tmp, SpawnLocation, FRotator()));
+    SpawnedActor->AddToRoot();
+    SpawnedActor->OnEndQuestConditionsReaching.BindLambda(
+        [this](APawn* Player)
+        {
+            // WhoCompletedQuest = Player;
+            UpdateQuestFlow(Player->GetController(), nullptr, EQuestProgress::Get);
+
+            DestroyItem(SpawnedActor);
+        });
+}
+
+void ATABaseGameMode::DestroyItem(TUniquePtr<ASpamActor>& ToDestroy)
+{
+    if (ToDestroy.IsValid())
+    {
+        ToDestroy->RemoveFromRoot();
+        ToDestroy->Destroy();
+        ToDestroy.Release();
+    }
+}
+
+
+void ATABaseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+
+    DestroyItem(SpawnedActor);
 }
 
 void ATABaseGameMode::GameModeProgressQuest(APawn* Player, APawn* NPC)

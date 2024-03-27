@@ -125,6 +125,33 @@ void ControllersFunctions::PostProccessQuestProgress(AController* FuncCaller, EQ
     }*/
 }
 
+bool ControllersFunctions::TryToSendRequestToStartEndQuest(AController* PlayerController, AController* NPCController)
+{
+    bool ControllersHasInteractableInterface =
+        HasInterfaceChecker::HasInteractableInterface(PlayerController) && HasInterfaceChecker::HasInteractableInterface(NPCController);
+
+    if (!ControllersHasInteractableInterface)
+    {
+        return ControllersHasInteractableInterface;
+    }
+
+    if (IInteractableInterface::Execute_CanEndQuest(NPCController))
+    {
+        IInteractableInterface::Execute_PawnTryToEndQuest(PlayerController, NPCController);
+        IInteractableInterface::Execute_PawnTryToEndQuest(NPCController, PlayerController);
+        return ControllersHasInteractableInterface;
+    }
+
+    if (IInteractableInterface::Execute_CanStartQuest(NPCController))
+    {
+        IInteractableInterface::Execute_PawnTryToStartNewQuest(PlayerController, NPCController);
+        IInteractableInterface::Execute_PawnTryToStartNewQuest(NPCController, PlayerController);
+        return ControllersHasInteractableInterface;
+    }
+
+    return ControllersHasInteractableInterface;
+}
+
 // if (CurrentQuestProgress == EQuestProgress::NONE)
 //     {
 //         CurrentQuestData = NewQuestData;

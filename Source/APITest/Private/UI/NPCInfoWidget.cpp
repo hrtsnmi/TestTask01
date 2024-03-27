@@ -3,29 +3,28 @@
 
 #include "UI/NPCInfoWidget.h"
 #include "Components/TextBlock.h"
-#include "AI/TAAIBaseCharacter.h"
 #include "QuestSystem/TAQuestComponent.h"
 
 void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestGiver)
 {
-    static const FName QuestProgress = FName(TEXT("QuestProgress: "));
-    static const FName NoneProgress = FName(TEXT("None"));
-    static const FName GetProgress = FName(TEXT("Get"));
-    static const FName DoneProgress = FName(TEXT("Done"));
+    static const FString QuestProgress = FString(TEXT("QuestProgress: "));
+    static const FString NoneProgress = FString(TEXT("None"));
+    static const FString GetProgress = FString(TEXT("Get"));
+    static const FString DoneProgress = FString(TEXT("Done"));
 
-    FString tmpString = QuestProgress.ToString();
+    FString tmpString = QuestProgress;
     switch (NewQuestProgress)
     {
-        case EQuestProgress::NONE: tmpString += NoneProgress.ToString(); break;
-        case EQuestProgress::Get: tmpString += GetProgress.ToString(); break;
-        default: tmpString += DoneProgress.ToString(); break;
+        case EQuestProgress::NONE: tmpString += NoneProgress; break;
+        case EQuestProgress::Get: tmpString += GetProgress; break;
+        default: tmpString += DoneProgress; break;
     }
     TB_QuestProgress->SetText(FText::FromString(tmpString));
 
     if (NewQuestData.Id == -1)
     {
-        static const FName NoQuest = FName(TEXT("Quest is unavailable "));
-        TB_ID->SetText(FText::FromName(NoQuest));
+        static const FString NoQuest = FString(TEXT("Quest is unavailable "));
+        TB_ID->SetText(FText::FromString(NoQuest));
 
         TB_QuestDesc->SetText(FText());
         TB_QuestType->SetText(FText());
@@ -34,23 +33,23 @@ void UNPCInfoWidget::UpdateQuestInfo(const FQuestData& NewQuestData, EQuestProgr
     else
     {
 
-        static const FName ID = FName(TEXT("ID: "));
-        static const FName QuestDesc = FName(TEXT("Quest Desc: "));
-        static const FName QuestType = FName(TEXT("Quest Type: "));
-        static const FName TargetLocation = FName(TEXT("Target Location: "));
-        static const FName FindItem = FName(TEXT("FindItem"));
-        static const FName MoveTo = FName(TEXT("MoveTo"));
+        static const FString ID = FString(TEXT("ID: "));
+        static const FString QuestDesc = FString(TEXT("Quest Desc: "));
+        static const FString QuestType = FString(TEXT("Quest Type: "));
+        static const FString TargetLocation = FString(TEXT("Target Location: "));
+        static const FString FindItem = FString(TEXT("FindItem"));
+        static const FString MoveTo = FString(TEXT("MoveTo"));
 
-        tmpString = ID.ToString() + FString::FromInt(NewQuestData.Id);
+        tmpString = ID + FString::FromInt(NewQuestData.Id);
         TB_ID->SetText(FText::FromString(tmpString));
 
-        tmpString = QuestDesc.ToString() + NewQuestData.QuestDesc;
+        tmpString = QuestDesc + NewQuestData.QuestDesc;
         TB_QuestDesc->SetText(FText::FromString(tmpString));
 
-        tmpString = QuestType.ToString() + (NewQuestData.QuestType == EQuestType::FindItem ? (FindItem.ToString()) : (MoveTo.ToString()));
+        tmpString = QuestType + (NewQuestData.QuestType == EQuestType::FindItem ? FindItem : MoveTo);
         TB_QuestType->SetText(FText::FromString(tmpString));
 
-        tmpString = TargetLocation.ToString() + NewQuestData.TargetLocation.ToString();
+        tmpString = TargetLocation + NewQuestData.TargetLocation.ToString();
         TB_TargetLocation->SetText(FText::FromString(tmpString));
     }
 }

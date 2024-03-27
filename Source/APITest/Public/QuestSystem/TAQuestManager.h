@@ -14,6 +14,8 @@ class APITEST_API UTAQuestManager : public UObject
 {
     GENERATED_BODY()
 
+    friend struct TDefaultDelete<UTAQuestManager>;
+
 private:
     UPROPERTY()
     TArray<FQuestData> QuestDataArray;
@@ -21,7 +23,7 @@ private:
 
 protected:
     UTAQuestManager();
-    //~UTAQuestManager();
+    ~UTAQuestManager();
 
     //static UTAQuestManager* SingletonInstance;
 
