@@ -5,11 +5,18 @@
 #include "Functions/Functions.h"
 #include "Interfaces/QuestComponentOwnerInterface.h"
 
-void ANPCAIController::OnPossess(APawn* InPawn)
-{
-    Super::OnPossess(InPawn);
+//void ANPCAIController::OnPossess(APawn* InPawn)
+//{
+//    Super::OnPossess(InPawn);
+//
+//    ControllersFunctions::OnPossess(InPawn);
+//}
 
-    ControllersFunctions::OnPossess(InPawn);
+void ANPCAIController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    ControllersFunctions::BeginPlay(this);
 }
 
 bool ANPCAIController::UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress)

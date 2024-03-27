@@ -23,6 +23,8 @@ namespace ControllersFunctions
 {
 void OnPossess(APawn* InPawn);
 
+void BeginPlay(AController* Controller);
+
 bool UnderInteract(AController* Controller, FQuestData& OutData, EQuestProgress& OutProgress);
 
 bool CanPawnDoQuest(APawn* Pawn, EInteractType InteractType, bool isStarting = true);

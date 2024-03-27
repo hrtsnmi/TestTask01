@@ -18,8 +18,8 @@ class APITEST_API ATAPlayerController : public APlayerController, public IIntera
     GENERATED_BODY()
 
 protected:
-    virtual void OnPossess(APawn* InPawn) override;
-
+    //virtual void OnPossess(APawn* InPawn) override;
+    virtual void BeginPlay() override;
 
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;

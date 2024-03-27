@@ -5,12 +5,18 @@
 #include "Functions/Functions.h"
 #include "Data/FQuestData.h"
 
+//void ATAPlayerController::OnPossess(APawn* InPawn)
+//{
+//    Super::OnPossess(InPawn);
+//
+//    ControllersFunctions::OnPossess(InPawn);
+//}
 
-void ATAPlayerController::OnPossess(APawn* InPawn)
+void ATAPlayerController::BeginPlay()
 {
-    Super::OnPossess(InPawn);
+    Super::BeginPlay();
 
-    ControllersFunctions::OnPossess(InPawn);
+    ControllersFunctions::BeginPlay(this);
 }
 
 bool ATAPlayerController::UnderInteract_Implementation(FQuestData& OutData, EQuestProgress& OutProgress)

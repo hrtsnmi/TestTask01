@@ -7,6 +7,7 @@ namespace QuestFlowDelegates
 
 DECLARE_DELEGATE_TwoParams(OnQuestStartSignature, AController*, AController*);
 DECLARE_DELEGATE_TwoParams(OnQuestEndSignature, AController*, AController*);
+DECLARE_DELEGATE_RetVal(const FQuestData&, OnGameModeNeedsToGetQuestSignature);
 
 // Delegates forPlayerState
 DECLARE_DELEGATE_RetVal(const FQuestData&, OnGetQuestDataSignature);

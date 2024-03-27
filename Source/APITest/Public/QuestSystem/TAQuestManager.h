@@ -17,16 +17,17 @@ class APITEST_API UTAQuestManager : public UObject
 private:
     UPROPERTY()
     TArray<FQuestData> QuestDataArray;
-    int32 index{0};
+    mutable int32 index{0};
 
 protected:
     UTAQuestManager();
+    //~UTAQuestManager();
 
-    static UTAQuestManager* SingletonInstance;
+    //static UTAQuestManager* SingletonInstance;
 
 public:
 
     static UTAQuestManager* GetInstance();
 
-    FQuestData GetAvailableQuest();
+    const FQuestData& GetAvailableQuest() const;
 };

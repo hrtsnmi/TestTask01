@@ -12,9 +12,16 @@
 
 void ControllersFunctions::OnPossess(APawn* InPawn)
 {
+}
+
+void ControllersFunctions::BeginPlay(AController* Controller)
+{
+    APawn* InPawn = Controller->GetPawn();
+
+    check(InPawn);
+
     if (ATABaseGameMode* GM = Cast<ATABaseGameMode>(InPawn->GetWorld()->GetAuthGameMode()))
     {
-        AController* Controller = InPawn->GetController();
         GM->SetInteractType(Controller, (bool)Cast<ATAPlayerController>(Controller));
         GM->InitQuestData(Controller, (HasInterfaceChecker::HasInteractableInterface(Controller)
                                               ? IInteractableInterface::Execute_GetInteractType(Controller) == EInteractType::Master

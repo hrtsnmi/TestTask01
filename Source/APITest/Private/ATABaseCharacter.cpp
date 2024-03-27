@@ -31,7 +31,7 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
 
     if (GEngine)
     {
-        GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
+        GEngine->AddOnScreenDebugMessage(2, 0.5f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
     }
 
     TArray<AActor*> QuestOwnerActors;
@@ -55,6 +55,13 @@ void ATABaseCharacter::Interact(const FInputActionValue& Value)
 
             if (TryToSendRequestToStartEndQuest(QuestOwnerPawn->GetController()))
             {
+                if (GEngine)
+                {
+                    GEngine->AddOnScreenDebugMessage(1, 0.5f, FColor::Blue,
+                        FString::Printf(
+                            TEXT("Interact %s and %s"), *GetController()->GetName(), *QuestOwnerPawn->GetController()->GetName()));
+                }
+
                 break;
             }
             else
@@ -97,6 +104,10 @@ void ATABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Blue, FString::Printf(TEXT("E button pressed")));
+    }
 }
 
 void ATABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

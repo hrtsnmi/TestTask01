@@ -3,7 +3,7 @@
 
 #include "Gamemode/TABaseGameMode.h"
 
-#include "QuestSystem/TAQuestManager.h"
+#include "GameInstance/TAMainGameInstance.h"
 #include "Data/FQuestData.h"
 #include "TAPlayerState.h"
 
@@ -17,15 +17,18 @@
 
 ATABaseGameMode::ATABaseGameMode()
 {
-    TAQuestManager = UTAQuestManager::GetInstance();
+    //TAQuestManager = UTAQuestManager::GetInstance();
 
 }
 
-
-void ATABaseGameMode::StartPlay()
+void ATABaseGameMode::BeginPlay()
 {
-    Super::StartPlay();
+    Super::BeginPlay();
 
+    if (UTAMainGameInstance* GameInstance = GetGameInstance<UTAMainGameInstance>())
+    {
+        GameInstance->SetupDelegatesForGameMode(this);
+    }
 }
 
 void ATABaseGameMode::PostLogin(APlayerController* NewPlayer)
@@ -47,11 +50,17 @@ void ATABaseGameMode::SetInteractType(AController* InController, bool bIsMasterI
 }
 
 
-FQuestData ATABaseGameMode::GetAvailableQuest() const
+const FQuestData& ATABaseGameMode::GetAvailableQuest() const
 {
-    static FQuestData NewQuestData;
-
-    return TAQuestManager ? (TAQuestManager->GetAvailableQuest()) : (NewQuestData);
+    if (OnGameModeNeedsToGetQuest.IsBound())
+    {
+        return OnGameModeNeedsToGetQuest.Execute();
+    }
+    else
+    {
+        static FQuestData EmptyData;
+        return EmptyData;
+    }
 }
 
 void ATABaseGameMode::SetupDelegatesForQuestComponent(AController* QuestController)

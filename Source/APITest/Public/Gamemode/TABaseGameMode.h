@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
 #include "../Functions/Functions.h"
+#include "DeclaringDelegatesForQuestFlow.h"
 
 #include "TABaseGameMode.generated.h"
 
 /**
  * 
  */
-class UTAQuestManager;
 class ASpamActor;
 
 struct FQuestData;
@@ -29,9 +29,8 @@ private:
     TSubclassOf<ASpamActor> FindItemSubClass;
 
 private:
-    UTAQuestManager* TAQuestManager{nullptr};
 
-    friend void ControllersFunctions::OnPossess(APawn* InPawn);
+    friend void ControllersFunctions::BeginPlay(AController* Controller);
 
     void InitQuestData(AController* InController, bool bIsMasterInteract);
 
@@ -52,17 +51,19 @@ private:
 public:
     ATABaseGameMode();
 
-    virtual void StartPlay() override;
-
 protected:
     virtual void PostLogin(APlayerController* NewPlayer) override;
+
+    virtual void BeginPlay() override;
 
     void SetInteractType(AController* InController, bool bIsMasterInteract);
 
     void SetNewQuestData(AController* QuestController, const FQuestData& NewQuestData, EQuestProgress NewQuestProgress, AActor* QuestTaker);
 
 public:
-    FQuestData GetAvailableQuest() const;
+    const FQuestData& GetAvailableQuest() const;
 
     void SetupDelegatesForQuestComponent(AController* PlayerController);
+
+    QuestFlowDelegates::OnGameModeNeedsToGetQuestSignature OnGameModeNeedsToGetQuest;
 };

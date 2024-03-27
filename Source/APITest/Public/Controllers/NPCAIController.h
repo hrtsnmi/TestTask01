@@ -20,7 +20,8 @@ class APITEST_API ANPCAIController : public AAIController, public IInteractableI
     GENERATED_BODY()
 
 protected:
-    virtual void OnPossess(APawn* InPawn) override;
+    // virtual void OnPossess(APawn* InPawn) override;
+    virtual void BeginPlay() override;
 
 protected:  // InteractableInterface
     EInteractType CurrentInteractType;

@@ -6,42 +6,46 @@
 #include "QuestSystem/ReadJson.h"
 #include "Data/FQuestData.h"
 
-UTAQuestManager* UTAQuestManager::SingletonInstance = nullptr;
+//UTAQuestManager* UTAQuestManager::SingletonInstance = nullptr;
 
 UTAQuestManager::UTAQuestManager()
 {
-    SingletonInstance = this;
+    FString JsonPath;
+    FQuestData QuestData;
+    JsonPath += FPaths::ProjectContentDir() + FString(TEXT("Json//questData.json"));
+
+    QuestDataArray = MoveTempIfPossible(ReadToArrayFromJsonObject(ReadJSon(*JsonPath)));
+
+    //SingletonInstance = this;
+
+    AddToRoot();
 }
+
+//UTAQuestManager::~UTAQuestManager()
+//{
+//    QuestDataArray.Empty();
+//    SingletonInstance->RemoveFromRoot();
+//}
 
 UTAQuestManager* UTAQuestManager::GetInstance()
 {
-    if (!SingletonInstance)
-    {
-        SingletonInstance = NewObject<UTAQuestManager>();
-        SingletonInstance->AddToRoot();
-
-        FString JsonPath;
-        FQuestData QuestData;
-        JsonPath += FPaths::ProjectContentDir() + FString(TEXT("Json//questData.json"));
-        
-        SingletonInstance->QuestDataArray = MoveTempIfPossible(ReadToArrayFromJsonObject(ReadJSon(*JsonPath)));
-    }
+    static UTAQuestManager* SingletonInstance = NewObject<UTAQuestManager>();
+    
     return SingletonInstance;
 }
 
-FQuestData UTAQuestManager::GetAvailableQuest()
+const FQuestData& UTAQuestManager::GetAvailableQuest() const
 {
-    FQuestData DataToTransfer;
-
     if (QuestDataArray.IsEmpty())
     {
-        //Dont have any quests
-        DataToTransfer.Id = -1;
-        return MoveTemp(DataToTransfer);
+        static FQuestData EmptyData;
+        return EmptyData;
     }
+    else
+    {
+        const FQuestData& DataToTransfer{QuestDataArray[index++]};
+        index %= QuestDataArray.Num();
 
-    DataToTransfer = QuestDataArray[index];
-    ++index %= QuestDataArray.Num();
-
-    return MoveTemp(DataToTransfer);
+        return DataToTransfer;
+    }
 }
